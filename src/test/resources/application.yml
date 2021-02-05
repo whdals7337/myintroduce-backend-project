@@ -1,0 +1,38 @@
+spring:
+  #profiles
+  profiles:
+    include: test
+
+    #console color
+  output:
+    ansi:
+      enable: ALWAYS
+
+  #jpa setting
+  jpa:
+    hibernate:
+      ddl-auto: none
+      properties:
+        hibernate:
+          format_sql: true
+          default_batch_fetch_size: 100
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+  #Rest api properties name strategy
+  jackson:
+    prorperty-naming-strategy: SNAKE_CASE
+
+  #h2 DB - for test
+  h2:
+    console:
+      enabled: true
+
+#log level
+logging:
+  level:
+    root: info
+    org:
+      hibernate:
+        SQL: debug
