@@ -1,6 +1,5 @@
 package com.myintroduce.web.api;
 
-import com.myintroduce.ifs.crudwithfile.CrudWitFileController;
 import com.myintroduce.repository.skill.SkillRepository;
 import com.myintroduce.web.dto.skill.SkillRequestDto;
 import com.myintroduce.web.dto.skill.SkillResponseDto;

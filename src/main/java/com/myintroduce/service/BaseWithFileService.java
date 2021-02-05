@@ -1,5 +1,6 @@
-package com.myintroduce.ifs.crudwithfile;
+package com.myintroduce.service;
 
+import com.myintroduce.ifs.crudwithfile.CrudWithFileInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -6,7 +6,6 @@ import com.myintroduce.domain.network.Header;
 import com.myintroduce.domain.network.Pagination;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.error.exception.project.ProjectNotFoundException;
-import com.myintroduce.ifs.crudwithfile.BaseWithFileService;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.repository.project.ProjectRepository;
 import com.myintroduce.utill.FileUtil;

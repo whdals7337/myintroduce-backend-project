@@ -6,7 +6,6 @@ import com.myintroduce.domain.network.Header;
 import com.myintroduce.domain.network.Pagination;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.error.exception.skill.SkillNotFoundException;
-import com.myintroduce.ifs.crudwithfile.BaseWithFileService;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.repository.skill.SkillRepository;
 import com.myintroduce.utill.FileUtil;

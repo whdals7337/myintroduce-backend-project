@@ -1,8 +1,10 @@
-package com.myintroduce.ifs.crudwithfile;
+package com.myintroduce.web.api;
 
 
 import com.myintroduce.domain.network.Header;
 import com.myintroduce.error.exception.file.FileNotRequestException;
+import com.myintroduce.ifs.crudwithfile.CrudWithFileInterface;
+import com.myintroduce.service.BaseWithFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

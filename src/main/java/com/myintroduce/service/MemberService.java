@@ -7,7 +7,6 @@ import com.myintroduce.domain.network.Header;
 import com.myintroduce.domain.network.Pagination;
 import com.myintroduce.error.exception.file.FileNotTransferException;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
-import com.myintroduce.ifs.crudwithfile.BaseWithFileService;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.utill.FileUtil;
 import com.myintroduce.web.dto.member.MemberRequestDto;
