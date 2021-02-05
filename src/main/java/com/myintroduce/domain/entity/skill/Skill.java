@@ -28,8 +28,9 @@ public class Skill extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    public Skill(String skillName, Integer skillLevel, int level,
+    public Skill(Long id, String skillName, Integer skillLevel, int level,
                  FileInfo fileInfo, Member member) {
+        this.id = id;
         this.skillName = skillName;
         this.skillLevel = skillLevel;
         this.level = level;

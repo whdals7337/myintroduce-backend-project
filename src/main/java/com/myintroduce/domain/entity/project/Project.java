@@ -31,8 +31,9 @@ public class Project extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    public Project(String projectTitle, String projectContent, String projectPostScript,
+    public Project(Long id, String projectTitle, String projectContent, String projectPostScript,
                    String projectLink, int level, FileInfo fileInfo, Member member) {
+        this.id = id;
         this.projectTitle = projectTitle;
         this.projectContent = projectContent;
         this.projectPostScript = projectPostScript;

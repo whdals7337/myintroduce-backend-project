@@ -39,8 +39,9 @@ public class Member extends BaseTimeEntity {
     private List<Skill> skills = new ArrayList<>();
 
     @Builder
-    public Member(String comment, String subIntroduction, String introduction,
+    public Member(Long id, String comment, String subIntroduction, String introduction,
                   String phoneNumber, String email, String selectYN, FileInfo fileInfo) {
+        this.id = id;
         this.comment = comment;
         this.subIntroduction = subIntroduction;
         this.introduction = introduction;
