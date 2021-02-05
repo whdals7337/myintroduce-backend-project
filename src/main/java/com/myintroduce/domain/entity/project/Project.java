@@ -31,9 +31,8 @@ public class Project extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    public Project(Long id, String projectTitle, String projectContent, String projectPostScript,
+    public Project(String projectTitle, String projectContent, String projectPostScript,
                    String projectLink, int level, FileInfo fileInfo, Member member) {
-        this.id = id;
         this.projectTitle = projectTitle;
         this.projectContent = projectContent;
         this.projectPostScript = projectPostScript;
@@ -61,7 +60,7 @@ public class Project extends BaseTimeEntity {
     // 프로젝트와 연결된 프로필 변경
     public void changeProfile(Member member) {
         this.member = member;
-        member.getProjectList().add(this);
+        member.getProjects().add(this);
     }
 
     public void levelUp() {

@@ -1,0 +1,25 @@
+#admin id
+admin:
+  adminId: test
+  password: test
+
+#file setting
+spring:
+  servlet:
+    multipart:
+      enabled: true
+    max-file-size: 200MB
+    .max-request-size: 215MB
+
+#domain
+server-domain: http://localhost:8080
+
+file:
+  upload-dir: /test-dir/files/
+  images-dir: images
+  member-dir: member
+  project-dir: project
+  skill-dir: skill
+
+
+    

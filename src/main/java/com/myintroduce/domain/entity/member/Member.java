@@ -7,14 +7,14 @@ import com.myintroduce.domain.entity.skill.Skill;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Builder
-@ToString(exclude = {"projectList", "skillList"})
+@ToString(exclude = {"projects", "skills"})
 public class Member extends BaseTimeEntity {
 
     @Id
@@ -33,10 +33,22 @@ public class Member extends BaseTimeEntity {
     private FileInfo fileInfo;
 
     @OneToMany(mappedBy = "member")
-    private List<Project> projectList;
+    private List<Project> projects = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<Skill> skillList;
+    private List<Skill> skills = new ArrayList<>();
+
+    @Builder
+    public Member(String comment, String subIntroduction, String introduction,
+                  String phoneNumber, String email, String selectYN, FileInfo fileInfo) {
+        this.comment = comment;
+        this.subIntroduction = subIntroduction;
+        this.introduction = introduction;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.selectYN = selectYN;
+        this.fileInfo = fileInfo;
+    }
 
     public void update(Member member){
         this.comment = member.getComment();
