@@ -22,7 +22,7 @@ spring:
 
   #Rest api properties name strategy
   jackson:
-    prorperty-naming-strategy: SNAKE_CASE
+    property-naming-strategy: SNAKE_CASE
 
 #log level
 logging:

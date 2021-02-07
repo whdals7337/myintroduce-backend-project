@@ -10,7 +10,7 @@ spring:
 
   #Rest api properties name strategy
   jackson:
-    prorperty-naming-strategy: SNAKE_CASE
+    property-naming-strategy: SNAKE_CASE
 
   #h2 DB - for test
   h2:
