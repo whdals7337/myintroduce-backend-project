@@ -4,6 +4,7 @@ import com.myintroduce.error.exception.file.FileNotRequestException;
 import com.myintroduce.error.exception.file.FileNotTransferException;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.error.exception.project.ProjectNotFoundException;
+import com.myintroduce.error.exception.session.LoginInfoWrongException;
 import com.myintroduce.error.exception.skill.SkillNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -89,6 +90,12 @@ public class ErrorController {
     @ExceptionHandler(MissingServletRequestPartException.class)
     public ErrorMsg handleMissingServletRequestPartException(MissingServletRequestPartException e) {
         return new ErrorMsg(HttpStatus.BAD_REQUEST, e.getRequestPartName() + " 의 값은 필수 입니다.");
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(LoginInfoWrongException.class)
+    public ErrorMsg handleLoginInfoWrongException(LoginInfoWrongException e) {
+        return new ErrorMsg(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

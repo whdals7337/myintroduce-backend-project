@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ProjectService extends BaseWithFileService<ProjectRequestDto, ProjectResponseDto, ProjectRepository> {
 
     @Value("${file.upload-dir}")
@@ -44,7 +45,6 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     private final MemberRepository memberRepository;
 
     @Override
-    @Transactional
     public Header<ProjectResponseDto> save(ProjectRequestDto requestDto, MultipartFile file) throws IOException {
         log.info("project save start");
 
@@ -74,7 +74,6 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     }
 
     @Override
-    @Transactional
     public Header update(ProjectRequestDto requestDto, Long id, MultipartFile file) {
         log.info("project update start");
         Optional<Project> optional = baseRepository.findById(id);
@@ -155,7 +154,6 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     }
 
     @Override
-    @Transactional
     public Header delete(Long id) {
         log.info("project delete start");
         Optional<Project> optional = baseRepository.findById(id);
@@ -175,7 +173,7 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Header<ProjectResponseDto> findById(Long id) {
         log.info("project findById start");
         log.info("project findById end");
@@ -186,7 +184,7 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Header<List<ProjectResponseDto>> findAll(ProjectRequestDto requestDto, Pageable pageable) {
         log.info("project findAll start");
         Page<Project> projects;
@@ -216,7 +214,7 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
         return Header.OK(projectResponseDtoList, pagination);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Project getProject(Long id) {
         return baseRepository.findById(id).orElseThrow(ProjectNotFoundException::new);
     }

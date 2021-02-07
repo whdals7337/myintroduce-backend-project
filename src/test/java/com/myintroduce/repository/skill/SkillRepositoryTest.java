@@ -24,12 +24,6 @@ class SkillRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @BeforeEach
-    public void cleanup() {
-        skillRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
-
     @Test
     public void findAllByMember_test() {
         // given

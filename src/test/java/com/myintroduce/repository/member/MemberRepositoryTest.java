@@ -24,11 +24,6 @@ class MemberRepositoryTest {
     @Autowired
     private SkillRepository skillRepository;
 
-    @AfterEach
-    public void cleanup() {
-        memberRepository.deleteAll();
-    }
-
     @Test
     public void findBySelectYN_test() {
         // given

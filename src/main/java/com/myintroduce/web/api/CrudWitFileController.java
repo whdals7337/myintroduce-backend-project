@@ -51,7 +51,7 @@ public abstract class CrudWitFileController<Req, Res, Repository> implements Cru
 
     @Override
     @GetMapping("")
-    public Header<List<Res>> findAll(Req requestDto, @PageableDefault(sort="rgDate", direction = Sort.Direction.ASC) Pageable pageable) {
+    public Header<List<Res>> findAll(Req requestDto, @PageableDefault(sort="createdDate", direction = Sort.Direction.ASC) Pageable pageable) {
         return baseService.findAll(requestDto, pageable);
     }
 }

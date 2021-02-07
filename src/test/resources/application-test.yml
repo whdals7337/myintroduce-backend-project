@@ -21,5 +21,9 @@ file:
   project-dir: project
   skill-dir: skill
 
+#jwt signature value
+jwt:
+  signature: 12345678901234567890123456789012
+
 
     

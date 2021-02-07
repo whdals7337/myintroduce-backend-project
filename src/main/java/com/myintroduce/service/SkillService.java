@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResponseDto, SkillRepository> {
 
     @Value("${file.upload-dir}")
@@ -47,7 +48,6 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
     private final MemberRepository memberRepository;
 
     @Override
-    @Transactional
     public Header<SkillResponseDto> save(SkillRequestDto requestDto, MultipartFile file) throws IOException {
         log.info("skill save start");
 
@@ -77,7 +77,6 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
     }
 
     @Override
-    @Transactional
     public Header update(SkillRequestDto requestDto, Long id, MultipartFile file) {
         log.info("skill update start");
         Optional<Skill> optional = baseRepository.findById(id);
@@ -136,7 +135,6 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
     }
 
     @Override
-    @Transactional
     public Header delete(Long id) {
         log.info("skill delete start");
         Optional<Skill> optional = baseRepository.findById(id);
@@ -156,7 +154,7 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Header<SkillResponseDto> findById(Long id) {
         log.info("skill findById start");
         log.info("member findById end");
@@ -166,7 +164,7 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
                 .orElseThrow(SkillNotFoundException::new);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Header<List<SkillResponseDto>> findAll(SkillRequestDto requestDto, Pageable pageable) {
         log.info("skill findAll start");
         Page<Skill> skills;
@@ -196,7 +194,7 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
         return Header.OK(skillResponseDtoList, pagination);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Skill getSkill(Long id) {
         return baseRepository.findById(id).orElseThrow(SkillNotFoundException::new);
     }

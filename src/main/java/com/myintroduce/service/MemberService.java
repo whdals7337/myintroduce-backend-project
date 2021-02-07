@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class MemberService extends BaseWithFileService<MemberRequestDto, MemberResponseDto, MemberRepository> {
 
     @Value("${file.upload-dir}")
@@ -49,7 +50,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     private final ProjectService projectService;
 
     @Override
-    @Transactional
     public Header<MemberResponseDto> save(MemberRequestDto requestDto, MultipartFile file) throws FileNotTransferException {
         log.info("member save start");
 
@@ -84,7 +84,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     }
 
     @Override
-    @Transactional
     public Header update(MemberRequestDto requestDto, Long id, MultipartFile file) {
         log.info("member update start");
         Optional<Member> optional = baseRepository.findById(id);
@@ -141,7 +140,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     }
 
     @Override
-    @Transactional
     public Header delete(Long id) {
         log.info("member delete start");
         Optional<Member> optional = baseRepository.findById(id);
@@ -162,7 +160,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Header<MemberResponseDto> findById(Long id) {
         log.info("member findById start");
         log.info("member findById end");
@@ -172,7 +170,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
                 .orElseThrow(MemberNotFoundException::new);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Header<List<MemberResponseDto>> findAll(MemberRequestDto requestDto, Pageable pageable) {
         log.info("member findAll start");
         Page<Member> members = baseRepository.findAll(pageable);
@@ -192,7 +190,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
         return Header.OK(memberResponseDtoList, pagination);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Header<MemberResponseDto> findBySelectYN() {
         log.info("member findBySelectYN start");
         log.info("member findBySelectYN end");
@@ -202,7 +200,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
                 .orElseThrow(MemberNotFoundException::new);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Header<MemberTotalInfoResponseDto> totalInfo(Long id) {
         log.info("member totalInfo start");
 
@@ -244,7 +242,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
         return Header.OK(memberTotalInfoResponseDto);
     }
 
-    @Transactional
     public Header<MemberResponseDto> updateSelect(Long id){
         List<Member> memberList = baseRepository.findAll();
         for(Member member : memberList){

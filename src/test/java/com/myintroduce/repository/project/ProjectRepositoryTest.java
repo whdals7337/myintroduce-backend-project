@@ -26,12 +26,6 @@ class ProjectRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @AfterEach
-    public void cleanup() {
-        projectRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
-
     @Test
     public void findByLevelBetween_test() {
         // given
