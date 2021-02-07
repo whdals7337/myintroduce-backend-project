@@ -40,7 +40,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = header.substring("Bearer ".length());
         Claims claims = jwtUtil.getClaims(token);
 
-        if (claims != null) {
+        if (claims != null && jwtUtil.isExpired(token)) {
             User user = userRepository.findByUsername(String.valueOf(claims.get("username"))).orElseThrow(LoginInfoWrongException::new);
             PrincipalDetails principalDetails = new PrincipalDetails(user);
 

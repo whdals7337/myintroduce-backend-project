@@ -15,7 +15,7 @@ public class JwtUtil {
     }
 
     public String createToken(long id, String username) {
-        Long expiredTime = 1000 * 60L * 60L * 2L; // 2시간 설정
+        long expiredTime = 1000 * 60L * 60L * 2L; // 2시간 설정
         Date extDate = new Date();
         extDate.setTime(extDate.getTime() + expiredTime);
 
