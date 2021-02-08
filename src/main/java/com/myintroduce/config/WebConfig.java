@@ -17,4 +17,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/**").addResourceLocations("file:///"+fileUploadPath);
     }
+
+    // CORS 설정 //
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET");
+    }
 }
