@@ -15,7 +15,6 @@ cache:
 before_install:
   - sudo mkdir -p /test-dir/files
   - sudo chmod 777 /test-dir/files
-  - cd back-end/
   - chmod +x gradlew
 
 script: "./gradlew clean build"
