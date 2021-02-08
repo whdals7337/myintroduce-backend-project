@@ -2,13 +2,12 @@ package com.myintroduce.utill;
 
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtUtilTest {
 
-    private String key = "12345678901234567890123456789012";
+    private String key = "wellbell_dev_jwt_signature_value";
     private JwtUtil jwtUtil = new JwtUtil(key);
 
     @Test
@@ -44,6 +43,6 @@ class JwtUtilTest {
         Boolean expired = jwtUtil.isExpired(token);
 
         // then
-        assertThat(expired).isTrue();
+        assertThat(expired).isFalse();
     }
 }

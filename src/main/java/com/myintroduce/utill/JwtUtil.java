@@ -38,6 +38,6 @@ public class JwtUtil {
     public Boolean isExpired(String token) {
         Claims claims = getClaims(token);
         Date expDate = claims.getExpiration();
-        return expDate.after(new Date());
+        return expDate.before(new Date());
     }
 }
