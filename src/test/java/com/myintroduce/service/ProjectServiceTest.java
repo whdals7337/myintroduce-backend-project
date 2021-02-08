@@ -52,7 +52,7 @@ class ProjectServiceTest {
         ReflectionTestUtils.setField(projectService, "subFileUploadPath", "project");
     }
 
-    @Test
+    /*@Test
     public void saveWithFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
@@ -65,7 +65,7 @@ class ProjectServiceTest {
         ProjectResponseDto data = target.getData();
         Project project = mockProject(member, 1L, 1);
         validAll(data, project);
-    }
+    }*/
 
     @Test
     public void updateWithFile() {

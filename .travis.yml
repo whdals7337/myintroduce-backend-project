@@ -1,0 +1,58 @@
+language: java
+jdk:
+  - openjdk8
+
+branches:
+  only:
+    - master
+
+# Travis CI 서버의 Home
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
+
+before_install:
+  - sudo mkdir -p /test-dir/files
+  - sudo chmod 777 /test-dir/files
+  - cd back-end/
+  - chmod +x gradlew
+
+script: "./gradlew clean build"
+
+before_deploy:
+  - mkdir -p before-backend-deploy
+  - cp scripts/*.sh before-backend-deploy/
+  - cp appspec.yml before-backend-deploy/
+  - cp build/libs/*.jar before-backend-deploy/
+  - cd before-backend-deploy && zip -r before-backend-deploy *
+  - cd ../ && mkdir -p deploy-backend
+  - mv before-backend-deploy/before-backend-deploy.zip deploy-backend/myintroduce-backend.zip
+
+deploy:
+  - provider: s3
+    access_key_id: $ACCESS_KEY_ID
+    secret_access_key: $SECRET_ACCESS_KEY
+    bucket: myintroduce-springboot-build
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: private
+    local_dir: deploy-backend
+    wait-until-deployed: true
+
+  - provider: codedeploy
+    access_key_id: $ACCESS_KEY_ID
+    secret_access_key: $SECRET_ACCESS_KEY
+    bucket: myintroduce-springboot-build
+    key: myintroduce-backend.zip
+    bundle_type: zip
+    application: myintroduce-springboot-webservice
+    deployment_group: myintroduce-springboot-webservice-group
+    region: ap-northeast-2
+    wait-until-deployed: true
+
+# CI 실행 완료시 메일로 알람
+notifications:
+  email:
+    recipients:
+      - uok0201@gmail.com

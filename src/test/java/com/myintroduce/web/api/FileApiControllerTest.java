@@ -5,8 +5,6 @@ import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.entity.user.User;
 import com.myintroduce.domain.entity.user.UserRole;
 import com.myintroduce.repository.member.MemberRepository;
-import com.myintroduce.repository.project.ProjectRepository;
-import com.myintroduce.repository.skill.SkillRepository;
 import com.myintroduce.repository.user.UserRepository;
 import com.myintroduce.utill.JwtUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -24,7 +22,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
