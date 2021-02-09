@@ -52,7 +52,7 @@ class SkillServiceTest {
         ReflectionTestUtils.setField(skillService, "subFileUploadPath", "skill");
     }
 
-   /* @Test
+    @Test
     public void saveWithFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
@@ -65,7 +65,7 @@ class SkillServiceTest {
         SkillResponseDto data = target.getData();
         Skill skill = mockSkill(member, 1L, 1);
         validAll(data, skill);
-    }*/
+    }
 
     @Test
     public void updateWithFile() {

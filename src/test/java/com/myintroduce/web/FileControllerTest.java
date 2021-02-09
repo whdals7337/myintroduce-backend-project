@@ -133,7 +133,7 @@ class FileControllerTest {
 
         Member member = all.get(0);
 
-        String fileUrl = "http://localhost:" + port + "/api/download/member/" + member.getId();
+        String fileUrl = "http://localhost:" + port + "/download/member/" + member.getId();
 
         mockMvc.perform(get(fileUrl)
                 .header("Authorization", "Bearer "+token))

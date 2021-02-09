@@ -51,7 +51,7 @@ class MemberServiceTest {
         ReflectionTestUtils.setField(memberService, "subFileUploadPath", "member");
     }
 
-   /* @Test
+    @Test
     public void saveWithFile() throws FileNotTransferException {
         given(memberRepository.save(any(Member.class))).willReturn(TestUtil.mockMember(1L, "N"));
 
@@ -62,7 +62,7 @@ class MemberServiceTest {
         MemberResponseDto data = target.getData();
         Member member = TestUtil.mockMember(1L, "N");
         validAll(data, member);
-    }*/
+    }
 
     @Test
     public void updateWithFile() {
