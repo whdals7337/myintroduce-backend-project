@@ -135,7 +135,8 @@ class FileControllerTest {
 
         String fileUrl = "http://localhost:" + port + "/api/download/member/" + member.getId();
 
-        mockMvc.perform(get(fileUrl))
+        mockMvc.perform(get(fileUrl)
+                .header("Authorization", "Bearer "+token))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Hello, World!")));
     }
