@@ -29,7 +29,11 @@ dependencies {
 
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
 
-	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	compile (group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'){
+		exclude module: 'swagger-annotations' exclude module: 'swagger-models'
+	}
+	compile "io.swagger:swagger-annotations:1.5.21"
+	compile "io.swagger:swagger-models:1.5.21"
 	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 
 	compile 'io.jsonwebtoken:jjwt-api:0.11.2'
