@@ -185,19 +185,9 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
 
     @Override
     @Transactional(readOnly = true)
-    public Header<List<ProjectResponseDto>> findAll(ProjectRequestDto requestDto, Pageable pageable) {
+    public Header<List<ProjectResponseDto>> findAll(Pageable pageable) {
         log.info("project findAll start");
-        Page<Project> projects;
-        // 특정 멤버 id 값이 들어온 경우
-        if(requestDto.getMemberId() != null && requestDto.getMemberId() > 0) {
-            log.info("exist memberId");
-            Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow(MemberNotFoundException::new);
-            projects = baseRepository.findAllByMember(member, pageable);
-        }
-        else {
-            log.info("no memberId");
-            projects = baseRepository.findAll(pageable);
-        }
+        Page<Project> projects = baseRepository.findAll(pageable);
 
         List<ProjectResponseDto> projectResponseDtoList = projects.stream()
                         .map(this::response)

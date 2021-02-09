@@ -13,5 +13,5 @@ public interface CrudWithFileInterface<Req, Res> {
     Header<Res> update(Req requestDto, Long id, MultipartFile file) throws IOException;
     Header delete(Long id);
     Header<Res> findById(Long id);
-    Header<List<Res>> findAll(Req requestDto, Pageable pageable);
+    Header<List<Res>> findAll(Pageable pageable);
 }

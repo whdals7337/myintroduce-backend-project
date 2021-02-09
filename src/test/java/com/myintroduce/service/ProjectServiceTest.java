@@ -186,7 +186,7 @@ class ProjectServiceTest {
                 .willReturn(new PageImpl<>(list));
 
         Header<List<ProjectResponseDto>> target = projectService
-                .findAll(new ProjectRequestDto(), PageRequest.of(0,4));
+                .findAll(PageRequest.of(0,4));
 
         List<ProjectResponseDto> projectResponseDtoList = target.getData();
         int i = 0;
@@ -200,45 +200,6 @@ class ProjectServiceTest {
         assertThat(pagination.getTotalElements()).isEqualTo(4);
         assertThat(pagination.getCurrentPage()).isEqualTo(0);
         assertThat(pagination.getCurrentElements()).isEqualTo(4);
-    }
-
-    @Test
-    public void findAllWithMemberId() {
-        List<Project> list = new ArrayList<>();
-        list.add(mockProject(TestUtil.mockMember(1L, "N"), 1L, 1));
-        list.add(mockProject(TestUtil.mockMember(1L, "N"), 2L, 1));
-
-        given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
-        given(projectRepository.findAllByMember(any(Member.class), any(Pageable.class))).willReturn(new PageImpl<>(list));
-
-        Header<List<ProjectResponseDto>> target = projectService
-                .findAll(mockProjectRequestDto(1L, 1), PageRequest.of(0,4));
-
-        List<ProjectResponseDto> projectResponseDtoList = target.getData();
-        int i = 0;
-        for(ProjectResponseDto data : projectResponseDtoList) {
-            validAll(data, list.get(i));
-            i++;
-        }
-
-        Pagination pagination = target.getPagination();
-        assertThat(pagination.getTotalPages()).isEqualTo(1);
-        assertThat(pagination.getTotalElements()).isEqualTo(2);
-        assertThat(pagination.getCurrentPage()).isEqualTo(0);
-        assertThat(pagination.getCurrentElements()).isEqualTo(2);
-    }
-
-    @Test
-    public void findAllWithMemberIdMemberNotFound() {
-        List<Project> list = new ArrayList<>();
-        list.add(mockProject(TestUtil.mockMember(1L, "N"), 1L, 1));
-        list.add(mockProject(TestUtil.mockMember(1L, "N"), 2L, 1));
-
-        given(memberRepository.findById(1L)).willReturn(Optional.empty());
-
-        assertThatExceptionOfType(MemberNotFoundException.class)
-                .isThrownBy(() -> projectService.findAll(mockProjectRequestDto(1L, 1), PageRequest.of(0,4)))
-                .withMessage("Member Entity가 존재하지 않습니다.");
     }
 
     @Test

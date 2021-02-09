@@ -165,19 +165,9 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
     }
 
     @Transactional(readOnly = true)
-    public Header<List<SkillResponseDto>> findAll(SkillRequestDto requestDto, Pageable pageable) {
+    public Header<List<SkillResponseDto>> findAll(Pageable pageable) {
         log.info("skill findAll start");
-        Page<Skill> skills;
-        // 특정 멤버 id 값이 들어온 경우
-        if(requestDto.getMemberId() != null && requestDto.getMemberId() > 0) {
-            log.info("exist memberId");
-            Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow(MemberNotFoundException::new);
-            skills = baseRepository.findAllByMember(member, pageable);
-        }
-        else {
-            log.info("no memberId");
-            skills = baseRepository.findAll(pageable);
-        }
+        Page<Skill> skills = baseRepository.findAll(pageable);
 
         List<SkillResponseDto> skillResponseDtoList = skills.stream()
                 .map(this::response)

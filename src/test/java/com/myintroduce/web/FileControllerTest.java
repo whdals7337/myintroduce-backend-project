@@ -1,4 +1,4 @@
-package com.myintroduce.web.api;
+package com.myintroduce.web;
 
 import com.myintroduce.domain.FileInfo;
 import com.myintroduce.domain.entity.member.Member;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class FileApiControllerTest {
+class FileControllerTest {
 
     @LocalServerPort
     private int port;
@@ -64,8 +64,9 @@ class FileApiControllerTest {
 
     @Test
     public void no_member() throws Exception {
-        String url = "http://localhost:" + port + "/api/download/member/1";
-        mockMvc.perform(get(url))
+        String url = "http://localhost:" + port + "/download/member/1";
+        mockMvc.perform(get(url)
+                .header("Authorization", "Bearer "+token))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.msg").value("Member Entity가 존재하지 않습니다."));
@@ -73,8 +74,9 @@ class FileApiControllerTest {
 
     @Test
     public void no_skill() throws Exception {
-        String url = "http://localhost:" + port + "/api/download/skill/1";
-        mockMvc.perform(get(url))
+        String url = "http://localhost:" + port + "/download/skill/1";
+        mockMvc.perform(get(url)
+                .header("Authorization", "Bearer "+token))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.msg").value("Skill Entity가 존재하지 않습니다."));
@@ -82,8 +84,9 @@ class FileApiControllerTest {
 
     @Test
     public void no_project() throws Exception {
-        String url = "http://localhost:" + port + "/api/download/project/1";
-        mockMvc.perform(get(url))
+        String url = "http://localhost:" + port + "/download/project/1";
+        mockMvc.perform(get(url)
+                .header("Authorization", "Bearer "+token))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.msg").value("Project Entity가 존재하지 않습니다."));
@@ -92,8 +95,9 @@ class FileApiControllerTest {
     @Test
     public void wrong_type() throws Exception {
         Member member = givenMember();
-        String url = "http://localhost:" + port + "/api/download/wrong/1";
-        mockMvc.perform(get(url))
+        String url = "http://localhost:" + port + "/download/wrong/1";
+        mockMvc.perform(get(url)
+                .header("Authorization", "Bearer "+token))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.msg").value("존재하지않는 파일입니다."));

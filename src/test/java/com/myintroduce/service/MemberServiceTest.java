@@ -153,7 +153,7 @@ class MemberServiceTest {
                 .willReturn(new PageImpl<>(list));
 
         Header<List<MemberResponseDto>> target = memberService
-                .findAll(new MemberRequestDto(), PageRequest.of(0,4));
+                .findAll(PageRequest.of(0,4));
 
         assertThat(target.getStatus()).isEqualTo("200");
 

@@ -1,4 +1,4 @@
-package com.myintroduce.web.api;
+package com.myintroduce.web;
 
 import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.entity.project.Project;
@@ -29,13 +29,13 @@ import java.util.Enumeration;
 
 @RequiredArgsConstructor
 @RestController
-public class FileApiController {
+public class FileController {
 
     private final MemberService memberService;
     private final ProjectService projectService;
     private final SkillService skillService;
 
-    @GetMapping("/api/download/{type}/{id}")
+    @GetMapping("/download/{type}/{id}")
     public ResponseEntity<Resource> fileDownload(@PathVariable String type, @PathVariable("id") Long id, HttpServletRequest request) throws IOException {
         String filePath;
         String filename;

@@ -171,7 +171,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     }
 
     @Transactional(readOnly = true)
-    public Header<List<MemberResponseDto>> findAll(MemberRequestDto requestDto, Pageable pageable) {
+    public Header<List<MemberResponseDto>> findAll(Pageable pageable) {
         log.info("member findAll start");
         Page<Member> members = baseRepository.findAll(pageable);
 

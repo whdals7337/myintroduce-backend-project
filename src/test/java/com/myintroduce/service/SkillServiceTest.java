@@ -165,7 +165,7 @@ class SkillServiceTest {
                 .willReturn(new PageImpl<>(list));
 
         Header<List<SkillResponseDto>> target = skillService
-                .findAll(new SkillRequestDto(), PageRequest.of(0,4));
+                .findAll(PageRequest.of(0,4));
 
         List<SkillResponseDto> skillResponseDtoList = target.getData();
         int i = 0;
@@ -179,45 +179,6 @@ class SkillServiceTest {
         assertThat(pagination.getTotalElements()).isEqualTo(4);
         assertThat(pagination.getCurrentPage()).isEqualTo(0);
         assertThat(pagination.getCurrentElements()).isEqualTo(4);
-    }
-
-    @Test
-    public void findAllWithMemberId() {
-        List<Skill> list = new ArrayList<>();
-        list.add(mockSkill(TestUtil.mockMember(1L, "N"), 1L, 1));
-        list.add(mockSkill(TestUtil.mockMember(1L, "N"), 2L, 1));
-
-        given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
-        given(skillRepository.findAllByMember(any(Member.class), any(Pageable.class))).willReturn(new PageImpl<>(list));
-
-        Header<List<SkillResponseDto>> target = skillService
-                .findAll(mockSkillRequestDto(1L, 1), PageRequest.of(0,4));
-
-        List<SkillResponseDto> skillResponseDtoList = target.getData();
-        int i = 0;
-        for(SkillResponseDto data : skillResponseDtoList) {
-            validAll(data, list.get(i));
-            i++;
-        }
-
-        Pagination pagination = target.getPagination();
-        assertThat(pagination.getTotalPages()).isEqualTo(1);
-        assertThat(pagination.getTotalElements()).isEqualTo(2);
-        assertThat(pagination.getCurrentPage()).isEqualTo(0);
-        assertThat(pagination.getCurrentElements()).isEqualTo(2);
-    }
-
-    @Test
-    public void findAllWithMemberIdMemberNotFound() {
-        List<Skill> list = new ArrayList<>();
-        list.add(mockSkill(TestUtil.mockMember(1L, "N"), 1L, 1));
-        list.add(mockSkill(TestUtil.mockMember(1L, "N"), 2L, 1));
-
-        given(memberRepository.findById(1L)).willReturn(Optional.empty());
-
-        assertThatExceptionOfType(MemberNotFoundException.class)
-                .isThrownBy(() -> skillService.findAll(mockSkillRequestDto(1L, 1), PageRequest.of(0,4)))
-                .withMessage("Member Entity가 존재하지 않습니다.");
     }
 
     @Test
