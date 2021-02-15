@@ -39,7 +39,7 @@ nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
     -jar \
     -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
     -Dspring.profiles.active=real1 \
-    $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
+    $JAR_NAME > $REPOSITORY/nohup1.out 2>&1 &
 
 sleep 20
 
@@ -79,7 +79,7 @@ do
           -jar \
           -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
           -Dspring.profiles.active=real2 \
-          $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
+          $JAR_NAME > $REPOSITORY/nohup2.out 2>&1 &
       break
   else
       echo "> Health check의 응답을 알 수 없거나 혹은 실행 상태가 아닙니다."
