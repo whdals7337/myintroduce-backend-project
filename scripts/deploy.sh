@@ -17,7 +17,7 @@ then
 else
   echo "> kill -15 $IDLE_PID"
   kill -15 ${IDLE_PID}
-  sleep 10
+  sleep 5
 fi
 
 echo "> 새 어플리케이션 배포"
@@ -60,7 +60,7 @@ do
       else
         echo "> kill -15 $IDLE_PID2"
         kill -15 ${IDLE_PID2}
-        sleep 10
+        sleep 5
       fi
 
       echo "> 새 어플리케이션 배포"
@@ -74,9 +74,7 @@ do
       chmod +x $JAR_NAME
 
       echo "> $JAR_NAME 실행"
-      nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
-          -Dscouter.config=/home/ec2-user/scouter/agent.java/conf/was02.conf \
-          -jar \
+      nohup java -jar \
           -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
           -Dspring.profiles.active=real2 \
           $JAR_NAME > $REPOSITORY/nohup2.out 2>&1 &
@@ -93,5 +91,5 @@ do
   fi
 
   echo "> Health check 연결 실패. 재시도..."
-  sleep 20
+  sleep 10
 done
