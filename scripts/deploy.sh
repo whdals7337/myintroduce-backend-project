@@ -32,8 +32,6 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 
-java
-
 nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
     -Dscouter.config=/home/ec2-user/scouter/agent.java/conf/was01.conf \
     -jar \
@@ -74,7 +72,10 @@ do
       chmod +x $JAR_NAME
 
       echo "> $JAR_NAME 실행"
-      nohup java -jar \
+
+      nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
+          -Dscouter.config=/home/ec2-user/scouter/agent.java/conf/was02.conf \
+          -jar \
           -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
           -Dspring.profiles.active=real2 \
           $JAR_NAME > $REPOSITORY/nohup2.out 2>&1 &
