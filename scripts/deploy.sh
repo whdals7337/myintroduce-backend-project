@@ -36,7 +36,6 @@ java
 
 nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
     -Dscouter.config=/home/ec2-user/scouter/agent.java/conf/was01.conf \
-    -Dobj_name=WAS8081 \
     -jar \
     -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
     -Dspring.profiles.active=real1 \
@@ -77,7 +76,6 @@ do
       echo "> $JAR_NAME 실행"
       nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
           -Dscouter.config=/home/ec2-user/scouter/agent.java/conf/was02.conf \
-          -Dobj_name=WAS8082 \
           -jar \
           -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
           -Dspring.profiles.active=real2 \
