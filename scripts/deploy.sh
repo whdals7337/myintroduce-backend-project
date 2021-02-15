@@ -17,7 +17,7 @@ then
 else
   echo "> kill -15 $IDLE_PID"
   kill -15 ${IDLE_PID}
-  sleep 5
+  sleep 10
 fi
 
 echo "> 새 어플리케이션 배포"
@@ -41,7 +41,7 @@ nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
     -Dspring.profiles.active=real1 \
     $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
 
-sleep 10
+sleep 20
 
 for RETRY_COUNT in {1..10}
 do
@@ -60,7 +60,7 @@ do
       else
         echo "> kill -15 $IDLE_PID2"
         kill -15 ${IDLE_PID2}
-        sleep 5
+        sleep 10
       fi
 
       echo "> 새 어플리케이션 배포"
@@ -93,5 +93,5 @@ do
   fi
 
   echo "> Health check 연결 실패. 재시도..."
-  sleep 10
+  sleep 20
 done
