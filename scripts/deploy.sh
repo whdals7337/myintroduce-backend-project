@@ -34,7 +34,8 @@ echo "> $JAR_NAME 실행"
 
 java
 
-nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar -Dobj_name=MY-INTRODUCE-WAS-8081 -DScouter.config=/home/ec2-user/scouter/agent.java/conf/myintroduce8081.conf -jar \
+nohup java -jar \
+    -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar -Dobj_name=MY-INTRODUCE-WAS-8081 -DScouter.config=/home/ec2-user/scouter/agent.java/conf/myintroduce8081.conf \
     -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
     -Dspring.profiles.active=real1 \
     $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
@@ -73,7 +74,8 @@ do
 
       echo "> $JAR_NAME 실행"
 
-      nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar -Dobj_name=MY-INTRODUCE-WAS-8082 -DScouter.config=/home/ec2-user/scouter/agent.java/conf/myintroduce8082.conf -jar \
+      nohup java -jar \
+          -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar -Dobj_name=MY-INTRODUCE-WAS-8081 -DScouter.config=/home/ec2-user/scouter/agent.java/conf/myintroduce8081.conf \
           -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
           -Dspring.profiles.active=real2 \
           $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
