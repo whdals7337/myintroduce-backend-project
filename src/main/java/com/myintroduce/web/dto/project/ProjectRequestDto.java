@@ -33,12 +33,13 @@ public class ProjectRequestDto {
     @ApiParam(value = "프로젝트 멤버", required = true, example = "15")
     private Long memberId;
 
-    public Project toEntity(Member member, String filePath, String fileOriginName, String fileUrl) {
+
+    public Project toEntity(FileInfo fileInfo, Member member) {
         return Project.builder()
                 .projectTitle(projectTitle)
                 .projectContent(projectContent)
                 .projectPostScript(projectPostScript)
-                .fileInfo(new FileInfo(filePath, fileOriginName, fileUrl))
+                .fileInfo(new FileInfo(fileInfo.getFilePath(), fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
                 .projectLink(projectLink)
                 .level(level)
                 .member(member)

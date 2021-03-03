@@ -72,7 +72,7 @@ class SkillServiceTest {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.findById(1L)).willReturn(Optional.of(mockSkill(member,1L, 3)));
-        given(memberRepository.getOne(any(Long.class))).willReturn(member);
+        given(memberRepository.findById(any(Long.class))).willReturn(Optional.of(member));
 
         Header target = skillService.update(mockSkillRequestDto(1L, 1), 1L, TestUtil.mockFile());
 
@@ -89,7 +89,7 @@ class SkillServiceTest {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.findById(1L)).willReturn(Optional.of(mockSkill(member,1L, 3)));
-        given(memberRepository.getOne(any(Long.class))).willReturn(member);
+        given(memberRepository.findById(any(Long.class))).willReturn(Optional.of(member));
 
         Header target = skillService.update(mockSkillRequestDto(1L, 1), 1L, null);
 

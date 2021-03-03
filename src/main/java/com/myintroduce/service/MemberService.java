@@ -1,5 +1,6 @@
 package com.myintroduce.service;
 
+import com.myintroduce.domain.FileInfo;
 import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.entity.project.Project;
 import com.myintroduce.domain.entity.skill.Skill;
@@ -50,34 +51,20 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     private final ProjectService projectService;
 
     @Override
-    public Header<MemberResponseDto> save(MemberRequestDto requestDto, MultipartFile file) throws FileNotTransferException {
+    public Header<MemberResponseDto> save(MemberRequestDto requestDto, MultipartFile file) throws IOException {
         log.info("member save start");
 
-        // [1] file parameter setting
-        String originalName = FileUtil.cutFileName(Objects.requireNonNull(file.getOriginalFilename()), 100);
-        String saveName = FileUtil.getRandomFileName(originalName);
-        String fileUrl = domain + "/" + dirType + "/" + subFileUploadPath + "/" + saveName;
-        String saveDir = fileUploadPath + subFileUploadPath;
-        String savePath =  saveDir +"/"+ saveName;
-        log.info("[1] file parameter setting");
+        // [1] member 생성 및 파일 정보 셋팅
+        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
+        log.info("[1] member 생성 및 파일 정보 셋팅");
 
-        // [2] file 디렉토리 생성
-        FileUtil.createDir(saveDir);
-        log.info("[2] file 디렉토리 생성");
+        // [2] member info DB 등록
+        Member member = baseRepository.save(requestDto.toEntity(fileInfo, "N"));
+        log.info("[2] member info DB 등록");
 
-        // [3] member info DB 등록
-        Member member = baseRepository.save(requestDto.toEntity(savePath, originalName, fileUrl, "N"));
-        log.info("[3] member info DB 등록");
-
-        // [4] file transfer
-        try {
-            file.transferTo(new File(savePath));
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new FileNotTransferException();
-        }
-        log.info("[4] file transfer");
-
+        // [3] file transfer
+        file.transferTo(new File(fileInfo.getFilePath()));
+        log.info("[3] file transfer");
 
         log.info("member save end");
         return Header.OK(response(member));
@@ -94,44 +81,35 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
                 log.info("첨부된 파일 없음");
 
                 // [1] member info DB update
-                member.update(requestDto.toEntity(member.getFileInfo().getFilePath(), member.getFileInfo().getFileOriginName(),
-                        member.getFileInfo().getFileUrl(), member.getSelectYN()));
+                member.update(requestDto.toEntity(member.getFileInfo(), member.getSelectYN()));
                 log.info("[1] member info DB update");
             }
             // 첨부된 파일이 있는 경우
             else {
                 log.info("첨부된 파일 있음");
 
-                // [1] file parameter setting
-                String originalName = FileUtil.cutFileName(Objects.requireNonNull(file.getOriginalFilename()), 100);
-                String saveName = FileUtil.getRandomFileName(originalName);
-                String fileUrl = domain + "/" + dirType + "/" + subFileUploadPath + "/" + saveName;
-                String saveDir = fileUploadPath + subFileUploadPath;
-                String savePath = saveDir + "/" + saveName;
+                // [1] member 생성 및 파일 정보 셋팅
+                FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
                 String preExistingFilePath = member.getFileInfo().getFilePath();
-                log.info("[1] file parameter setting");
+                log.info("[1] member 생성 및 파일 정보 셋팅");
 
-                // [2] file 디렉토리 생성
-                FileUtil.createDir(saveDir);
-                log.info("[2] file 디렉토리 생성");
+                // [2] member info DB update
+                member.update(requestDto.toEntity(fileInfo, member.getSelectYN()));
+                log.info("[2] member info DB update");
 
-                // [3] member info DB update
-                member.update(requestDto.toEntity(savePath, originalName, fileUrl, member.getSelectYN()));
-                log.info("[3] member info DB update");
-
-                // [4] file transfer
+                // [4\3] file transfer
                 try {
-                    file.transferTo(new File(savePath));
+                    file.transferTo(new File(fileInfo.getFilePath()));
                 } catch (IOException e) {
-                    log.info("[4] file transfer fail");
+                    log.info("[3] file transfer fail");
                     e.printStackTrace();
                 }
-                log.info("[4] file transfer");
+                log.info("[3] file transfer");
 
 
-                // [5] pre-existing file delete
+                // [4] pre-existing file delete
                 FileUtil.deleteFile(preExistingFilePath);
-                log.info("[5] pre-existing file delete");
+                log.info("[4] pre-existing file delete");
             }
 
             log.info("member update end");

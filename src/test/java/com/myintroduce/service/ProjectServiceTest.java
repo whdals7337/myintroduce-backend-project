@@ -72,7 +72,7 @@ class ProjectServiceTest {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(projectRepository.findById(1L)).willReturn(Optional.of(mockProject(member, 1L, 1)));
-        given(memberRepository.getOne(1L)).willReturn(TestUtil.mockMember(1L, "N"));
+        given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header target = projectService.update(mockProjectRequestDto(1L, 1), 1L,  TestUtil.mockFile());
 
@@ -89,7 +89,7 @@ class ProjectServiceTest {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(projectRepository.findById(1L)).willReturn(Optional.of(mockProject(member, 1L, 1)));
-        given(memberRepository.getOne(1L)).willReturn(TestUtil.mockMember(1L, "N"));
+        given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header target = projectService.update(mockProjectRequestDto(1L, 1), 1L,  null);
 
@@ -108,7 +108,7 @@ class ProjectServiceTest {
         list.add(mockProject(member, 3L, 3));
 
         given(projectRepository.findById(1L)).willReturn(Optional.of(mockProject(member, 1L, 1)));
-        given(memberRepository.getOne(1L)).willReturn(TestUtil.mockMember(1L, "N"));
+        given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
         given(projectRepository.findByLevelBetween(2,3)).willReturn(list);
 
         Header target = projectService.update(mockProjectRequestDto(1L, 3), 1L,  null);

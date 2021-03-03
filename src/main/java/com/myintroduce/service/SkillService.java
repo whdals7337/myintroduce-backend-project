@@ -1,5 +1,6 @@
 package com.myintroduce.service;
 
+import com.myintroduce.domain.FileInfo;
 import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.entity.skill.Skill;
 import com.myintroduce.domain.network.Header;
@@ -51,25 +52,20 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
     public Header<SkillResponseDto> save(SkillRequestDto requestDto, MultipartFile file) throws IOException {
         log.info("skill save start");
 
-        // [1] file parameter setting
-        String originalName = FileUtil.cutFileName(Objects.requireNonNull(file.getOriginalFilename()), 100);
-        String saveName = FileUtil.getRandomFileName(originalName);
-        String fileUrl = domain + "/" + dirType + "/" + subFileUploadPath + "/" + saveName;
-        String saveDir = fileUploadPath + subFileUploadPath;
-        String savePath =  saveDir +"/"+ saveName;
-        log.info("[1] file parameter setting");
+        // [1] member 조회
+        Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow(MemberNotFoundException::new);
+        log.info("[1] member 조회");
 
-        // [2] file 디렉토리 생성
-        FileUtil.createDir(saveDir);
-        log.info("[2] file 디렉토리 생성");
+        // [2] 파일 정보 셋팅
+        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
+        log.info("[2] 파일 정보 셋팅");
 
         // [3] project info DB 등록
-        Skill skill = baseRepository.save(requestDto.toEntity(memberRepository
-                .getOne(requestDto.getMemberId()), savePath, originalName, fileUrl));
+        Skill skill = baseRepository.save(requestDto.toEntity(fileInfo, member));
         log.info("[3] skill info DB 등록");
 
         // [4] file transfer
-        file.transferTo(new File(savePath));
+        file.transferTo(new File(fileInfo.getFilePath()));
         log.info("[4] file transfer");
 
         log.info("project save end");
@@ -82,40 +78,36 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
         Optional<Skill> optional = baseRepository.findById(id);
 
         return optional.map(skill -> {
+
+            // [1] member 조회
+            Member member = memberRepository.findById(requestDto.getMemberId())
+                    .orElseThrow(MemberNotFoundException::new);
+            log.info("[1] member 조회");
+
             // 첨부된 파일이 없는 경우
             if(file == null || file.isEmpty()) {
                 log.info("첨부된 파일 없음");
 
                 // [2] skill info DB update
-                skill.update(requestDto.toEntity(memberRepository.getOne(requestDto.getMemberId()),
-                        skill.getFileInfo().getFilePath(), skill.getFileInfo().getFileOriginName(), skill.getFileInfo().getFileUrl()));
+                skill.update(requestDto.toEntity(skill.getFileInfo(), member));
                 log.info("[2] skill info DB update");
             }
             // 첨부된 파일이 있는 경우
             else {
                 log.info("첨부된 파일 있음");
 
-                // [2] file parameter setting
-                String originalName = FileUtil.cutFileName(Objects.requireNonNull(file.getOriginalFilename()), 100);
-                String saveName = FileUtil.getRandomFileName(originalName);
-                String fileUrl = domain + "/" + dirType + "/" + subFileUploadPath + "/" + saveName;
-                String saveDir = fileUploadPath + subFileUploadPath;
-                String savePath =  saveDir +"/"+ saveName;
+                // [3] 파일 정보 셋팅
+                FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
                 String preExistingFilePath = skill.getFileInfo().getFilePath();
-                log.info("[2] file parameter setting");
-
-                // [3] file 디렉토리 생성
-                FileUtil.createDir(saveDir);
-                log.info("[3] file 디렉토리 생성");
+                log.info("[3] 파일 정보 셋팅");
 
                 // [4] skill info DB update
-                skill.update(requestDto.toEntity(memberRepository.getOne(requestDto.getMemberId()),
-                        savePath, originalName, fileUrl));
+                skill.update(requestDto.toEntity(fileInfo, member));
                 log.info("[4] skill info DB update");
 
                 // [5] file transfer
                 try {
-                    file.transferTo(new File(savePath));
+                    file.transferTo(new File(fileInfo.getFilePath()));
 
                 } catch (IOException e) {
                     log.info("[5] file transfer fail");

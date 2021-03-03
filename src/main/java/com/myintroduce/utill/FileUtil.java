@@ -1,5 +1,6 @@
 package com.myintroduce.utill;
 
+import com.myintroduce.domain.FileInfo;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.File;
@@ -34,5 +35,19 @@ public class FileUtil {
     public static void deleteFile(String filePath) {
         File file = new File(filePath);
         if(file.exists()) file.delete();
+    }
+
+    public static FileInfo getFileInfo(String originalName, String domain, String dirType, String fileUploadPath, String subFileUploadPath) {
+
+        // file parameter setting
+        String saveName = FileUtil.getRandomFileName(originalName);
+        String fileUrl = domain + "/" + dirType + "/" + subFileUploadPath + "/" + saveName;
+        String saveDir = fileUploadPath + subFileUploadPath;
+        String filePath =  saveDir +"/"+ saveName;
+
+        // file 디렉토리 생성
+        FileUtil.createDir(saveDir);
+
+        return new FileInfo(filePath, originalName, fileUrl);
     }
 }

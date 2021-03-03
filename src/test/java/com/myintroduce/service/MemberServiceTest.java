@@ -3,7 +3,6 @@ package com.myintroduce.service;
 import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.network.Header;
 import com.myintroduce.domain.network.Pagination;
-import com.myintroduce.error.exception.file.FileNotTransferException;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.web.dto.member.MemberRequestDto;
@@ -20,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +52,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void saveWithFile() throws FileNotTransferException {
+    public void saveWithFile() throws IOException {
         given(memberRepository.save(any(Member.class))).willReturn(TestUtil.mockMember(1L, "N"));
 
         Header<MemberResponseDto> target = memberService.save(mockMemberRequestDto(), TestUtil.mockFile());

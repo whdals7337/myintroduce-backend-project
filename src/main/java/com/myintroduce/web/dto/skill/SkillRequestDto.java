@@ -27,10 +27,10 @@ public class SkillRequestDto {
     @ApiParam(value = "스킬 멤버", required = true, example = "15")
     private Long memberId;
 
-    public Skill toEntity(Member member, String filePath, String fileOriginName, String fileUrl) {
+    public Skill toEntity(FileInfo fileInfo, Member member) {
         return Skill.builder()
                 .skillName(skillName)
-                .fileInfo(new FileInfo(filePath, fileOriginName, fileUrl))
+                .fileInfo(new FileInfo(fileInfo.getFilePath(), fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
                 .skillLevel(skillLevel)
                 .level(level)
                 .member(member)

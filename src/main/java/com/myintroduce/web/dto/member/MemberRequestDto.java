@@ -29,10 +29,11 @@ public class MemberRequestDto {
     @ApiParam(value = "대민페이지 하단 이메일", required = true, example = "uok0201@gmail.com")
     private String email;
 
-    public Member toEntity(String filePath, String originalName, String fileUrl, String selectYN) {
+
+    public Member toEntity(FileInfo fileInfo, String selectYN) {
         return  Member.builder()
                 .comment(comment)
-                .fileInfo(new FileInfo(filePath, originalName, fileUrl))
+                .fileInfo(new FileInfo(fileInfo.getFilePath(), fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
                 .subIntroduction(subIntroduction)
                 .introduction(introduction)
                 .phoneNumber(phoneNumber)
