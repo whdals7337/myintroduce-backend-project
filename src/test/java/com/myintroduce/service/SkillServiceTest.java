@@ -56,6 +56,7 @@ class SkillServiceTest {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.save(any(Skill.class))).willReturn(mockSkill(member, 1L, 1));
+        given(memberRepository.findById(any(Long.class))).willReturn(Optional.of(member));
 
         Header<SkillResponseDto> target = skillService.save(mockSkillRequestDto(1L, 1), TestUtil.mockFile());
 

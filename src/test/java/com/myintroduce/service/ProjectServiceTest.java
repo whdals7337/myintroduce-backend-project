@@ -56,6 +56,7 @@ class ProjectServiceTest {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(projectRepository.save(any(Project.class))).willReturn(mockProject(member, 1L, 1));
+        given(memberRepository.findById(any(Long.class))).willReturn(Optional.of(member));
 
         Header<ProjectResponseDto> target = projectService.save(mockProjectRequestDto(1L, 1), TestUtil.mockFile());
 
