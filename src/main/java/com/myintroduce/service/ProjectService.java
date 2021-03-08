@@ -53,12 +53,13 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
         log.info("[1] member 조회");
 
         // [2] 파일 정보 셋팅
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
+        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                dirType, fileUploadPath, subFileUploadPath);
         log.info("[2] 파일 정보 셋팅");
 
         // [3] project info DB 등록
         Project project = baseRepository.save(requestDto.toEntity(fileInfo, member));
-        log.info("[3] project info DB 등록");
+        log.info("[3] project info DB 등록" + project);
 
         // [4] file transfer
         file.transferTo(new File(fileInfo.getFilePath()));
@@ -74,28 +75,8 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
         Optional<Project> optional = baseRepository.findById(id);
 
         return optional.map(project -> {
-            // 순서값이 변경 된 경우
-            if(project.getLevel() != requestDto.getLevel()){
-                int originLevel = project.getLevel();
-                int changedLevel = requestDto.getLevel();
-
-                // 원래 순서 값이 변경할 순서 값보다 큰 경우
-                if (originLevel > changedLevel) {
-                    // 원래 값부터 변경할 순서 값보다 작은 순서의 칼럼의 순서값을 1 증가
-                    List<Project> rangeRows = baseRepository.findByLevelBetween(changedLevel, originLevel-1);
-                    for(Project row : rangeRows){
-                        row.levelUp();
-                    }
-                }
-                // 원래 순서 값이 변경할 순서 값보다 작은 경우
-                else {
-                    // 원래 값보다 크고 변경할 순서 값보다 작은 순서의 칼럼의 순서값을 1 감소
-                    List<Project> rangeRows = baseRepository.findByLevelBetween(originLevel+1, changedLevel);
-                    for(Project row : rangeRows){
-                        row.levelDown();
-                    }
-                }
-            }
+            // 순서 변경
+            changeLevel(project.getLevel(), requestDto.getLevel());
             log.info("[1] 순서 변경");
 
             // [2] member 조회
@@ -109,34 +90,36 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
 
                 // [3] project info DB update
                 project.update(requestDto.toEntity(project.getFileInfo(), member));
-                log.info("[3] project info DB update");
+                log.info("[3] project info DB update" + project);
+
+                log.info("project update end");
+                return Header.OK(response(project));
             }
             // 첨부된 파일이 있는 경우
-            else {
-                log.info("첨부된 파일 있음");
+            log.info("첨부된 파일 있음");
 
-                // [3] 파일 정보 셋팅
-                FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
-                String preExistingFilePath = project.getFileInfo().getFilePath();
-                log.info("[3] 파일 정보 셋팅");
+            // [3] 파일 정보 셋팅
+            FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                    dirType, fileUploadPath, subFileUploadPath);
+            String preExistingFilePath = project.getFileInfo().getFilePath();
+            log.info("[3] 파일 정보 셋팅");
 
-                // [4] project info DB update
-                project.update(requestDto.toEntity(fileInfo, member));
-                log.info("[4] project info DB update");
+            // [4] project info DB update
+            project.update(requestDto.toEntity(fileInfo, member));
+            log.info("[4] project info DB update" + project);
 
-                // [5] file transfer
-                try {
-                    file.transferTo(new File(fileInfo.getFilePath()));
-                } catch (IOException e) {
-                    log.info("[5] file transfer fail");
-                    e.printStackTrace();
-                }
-                log.info("[5] file transfer");
-
-                // [6] pre-existing file delete
-                FileUtil.deleteFile(preExistingFilePath);
-                log.info("[6] pre-existing file delete");
+            // [5] file transfer
+            try {
+                file.transferTo(new File(fileInfo.getFilePath()));
+            } catch (IOException e) {
+                log.info("[5] file transfer fail");
+                e.printStackTrace();
             }
+            log.info("[5] file transfer");
+
+            // [6] pre-existing file delete
+            FileUtil.deleteFile(preExistingFilePath);
+            log.info("[6] pre-existing file delete");
 
             log.info("project update end");
             return Header.OK(response(project));
@@ -211,5 +194,33 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
                 .level(project.getLevel())
                 .memberId(project.getMember().getId())
                 .build();
+    }
+
+    private void changeLevel(int originLevel, int changedLevel) {
+        // 순서변경이 없는 경우
+        if(originLevel == changedLevel) return;
+
+        if (originLevel > changedLevel) {
+            levelUp(changedLevel, originLevel-1);
+            return;
+        }
+        // 원래 순서 값이 변경할 순서 값보다 작은 경우
+        levelDown(originLevel+1, changedLevel);
+    }
+
+    private void levelUp(int leftLevel, int rightLevel) {
+        // 원래 값부터 변경할 순서 값보다 작은 순서의 칼럼의 순서값을 1 증가
+        List<Project> rangeRows = baseRepository.findByLevelBetween(leftLevel, rightLevel);
+        for(Project row : rangeRows) {
+            row.levelUp();
+        }
+    }
+
+    private void levelDown(int leftLevel, int rightLevel) {
+        // 원래 값보다 크고 변경할 순서 값보다 작은 순서의 칼럼의 순서값을 1 감소
+        List<Project> rangeRows = baseRepository.findByLevelBetween(leftLevel, rightLevel);
+        for(Project row : rangeRows) {
+            row.levelDown();
+        }
     }
 }

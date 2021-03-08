@@ -57,7 +57,8 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
         log.info("[1] member 조회");
 
         // [2] 파일 정보 셋팅
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
+        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                dirType, fileUploadPath, subFileUploadPath);
         log.info("[2] 파일 정보 셋팅");
 
         // [3] project info DB 등록
@@ -97,7 +98,8 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
                 log.info("첨부된 파일 있음");
 
                 // [3] 파일 정보 셋팅
-                FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
+                FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                        dirType, fileUploadPath, subFileUploadPath);
                 String preExistingFilePath = skill.getFileInfo().getFilePath();
                 log.info("[3] 파일 정보 셋팅");
 

@@ -6,7 +6,6 @@ import com.myintroduce.domain.entity.project.Project;
 import com.myintroduce.domain.entity.skill.Skill;
 import com.myintroduce.domain.network.Header;
 import com.myintroduce.domain.network.Pagination;
-import com.myintroduce.error.exception.file.FileNotTransferException;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.utill.FileUtil;
@@ -27,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -55,12 +53,13 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
         log.info("member save start");
 
         // [1] member 생성 및 파일 정보 셋팅
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
+        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                dirType, fileUploadPath, subFileUploadPath);
         log.info("[1] member 생성 및 파일 정보 셋팅");
 
         // [2] member info DB 등록
         Member member = baseRepository.save(requestDto.toEntity(fileInfo, "N"));
-        log.info("[2] member info DB 등록");
+        log.info("[2] member info DB 등록" + member);
 
         // [3] file transfer
         file.transferTo(new File(fileInfo.getFilePath()));
@@ -82,35 +81,35 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
                 // [1] member info DB update
                 member.update(requestDto.toEntity(member.getFileInfo(), member.getSelectYN()));
-                log.info("[1] member info DB update");
+                log.info("[1] member info DB update" + member);
+
+                return Header.OK(response(member));
             }
             // 첨부된 파일이 있는 경우
-            else {
-                log.info("첨부된 파일 있음");
+            log.info("첨부된 파일 있음");
 
-                // [1] member 생성 및 파일 정보 셋팅
-                FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain, dirType, fileUploadPath, subFileUploadPath);
-                String preExistingFilePath = member.getFileInfo().getFilePath();
-                log.info("[1] member 생성 및 파일 정보 셋팅");
+            // [1] member 생성 및 파일 정보 셋팅
+            FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                    dirType, fileUploadPath, subFileUploadPath);
+            String preExistingFilePath = member.getFileInfo().getFilePath();
+            log.info("[1] member 생성 및 파일 정보 셋팅");
 
-                // [2] member info DB update
-                member.update(requestDto.toEntity(fileInfo, member.getSelectYN()));
-                log.info("[2] member info DB update");
+            // [2] member info DB update
+            member.update(requestDto.toEntity(fileInfo, member.getSelectYN()));
+            log.info("[2] member info DB update with file" + member);
 
-                // [4\3] file transfer
-                try {
-                    file.transferTo(new File(fileInfo.getFilePath()));
-                } catch (IOException e) {
-                    log.info("[3] file transfer fail");
-                    e.printStackTrace();
-                }
-                log.info("[3] file transfer");
-
-
-                // [4] pre-existing file delete
-                FileUtil.deleteFile(preExistingFilePath);
-                log.info("[4] pre-existing file delete");
+            // [3] file transfer
+            try {
+                file.transferTo(new File(fileInfo.getFilePath()));
+            } catch (IOException e) {
+                log.info("[3] file transfer fail");
+                e.printStackTrace();
             }
+            log.info("[3] file transfer");
+
+            // [4] pre-existing file delete
+            FileUtil.deleteFile(preExistingFilePath);
+            log.info("[4] pre-existing file delete");
 
             log.info("member update end");
             return Header.OK(response(member));
@@ -125,7 +124,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
         return optional.map(member -> {
             // [1] member info DB delete
             baseRepository.delete(member);
-            log.info("[1] member info DB delete");
+            log.info("[1] member info DB delete" + member);
 
             // [2] pre-existing file delete
             FileUtil.deleteFile(member.getFileInfo().getFilePath());
