@@ -4,10 +4,8 @@ import com.myintroduce.domain.FileInfo;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 
 public class FileUtil {
 

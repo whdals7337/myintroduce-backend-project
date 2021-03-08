@@ -1,6 +1,5 @@
 package com.myintroduce.web.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myintroduce.domain.FileInfo;
 import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.entity.project.Project;

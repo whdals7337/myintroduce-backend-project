@@ -5,7 +5,6 @@ import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.entity.project.Project;
 import com.myintroduce.domain.network.Header;
 import com.myintroduce.domain.network.Pagination;
-import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.error.exception.project.ProjectNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.repository.project.ProjectRepository;

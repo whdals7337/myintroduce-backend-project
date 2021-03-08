@@ -4,7 +4,6 @@ import com.myintroduce.domain.FileInfo;
 import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.entity.skill.Skill;
 import com.myintroduce.repository.skill.SkillRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
