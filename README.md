@@ -14,40 +14,8 @@ http://wellbell.co.kr/
 https://wellbell.tistory.com/category/%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%ED%8E%98%EC%9D%B4%EC%A7%80%EB%A7%8C%EB%93%A4%EA%B8%B0
 
 2021-02-09 - swagger2 적용(api 문서화)
+http://ec2-13-125-104-210.ap-northeast-2.compute.amazonaws.com/swagger-ui.html
 
 2021-02-16 - scouter 적용 (apm 도구)
 
 ![image](https://user-images.githubusercontent.com/55545105/109240286-90473280-781a-11eb-9bf4-0173e998d0d9.png)
-
-2. 화면
-
-2 - 1 대민 페이지 (http://wellbell.co.kr/)
-
--메인
-
-![메인](https://user-images.githubusercontent.com/55545105/103889366-a5141d80-5129-11eb-967c-a39713632c1e.PNG)
-
-
-
-
-2 - 2관리자 페이지
-
-- 로그인
-
-![login](https://user-images.githubusercontent.com/55545105/103889345-9a598880-5129-11eb-9caa-331db08e2531.PNG)
-
-
-- 멤버
-
-![member](https://user-images.githubusercontent.com/55545105/103889349-9cbbe280-5129-11eb-89fa-34de0996f472.PNG)
-
-
-- 스킬
-
-![skill](https://user-images.githubusercontent.com/55545105/103889361-a0e80000-5129-11eb-9d55-41f1f13a2750.PNG)
-
-
-- 프로젝트
-
-![project](https://user-images.githubusercontent.com/55545105/103889364-a2b1c380-5129-11eb-9cae-a1ca14066d7c.PNG)
-
