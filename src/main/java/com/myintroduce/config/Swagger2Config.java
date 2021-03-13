@@ -53,7 +53,7 @@ public class Swagger2Config {
                 .title("MY-INTRODUCE REST 프로젝트 API DOC")
                 .version("v.1")
                 .description("자기소개 페이지 REST 프로젝트의 문서")
-                .termsOfServiceUrl("http://ec2-35-168-161-112.compute-1.amazonaws.com/")
+                .termsOfServiceUrl("http://wellbell.co.kr/")
                 .license("MY-INTRODUCE Licenses")
                 .licenseUrl("https://github.com/whdals7337/myintroduce-backend-project")
                 .build();
