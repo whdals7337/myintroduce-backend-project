@@ -2,8 +2,10 @@ package com.myintroduce.utill;
 
 import com.myintroduce.domain.FileInfo;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -50,5 +52,13 @@ public class FileUtil {
         FileUtil.createDir(saveDir);
 
         return new FileInfo(filePath, originalName, fileUrl);
+    }
+
+    public static void transferFile(MultipartFile file, String filePath) {
+        try {
+            file.transferTo(new File(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

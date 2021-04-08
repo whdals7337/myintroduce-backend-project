@@ -23,8 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,29 +47,23 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     private final ProjectService projectService;
 
     @Override
-    public Header<MemberResponseDto> save(MemberRequestDto requestDto, MultipartFile file) throws IOException {
-        log.info("member save start");
-
+    public Header<MemberResponseDto> save(MemberRequestDto requestDto, MultipartFile file) {
         // [1] member 생성 및 파일 정보 셋팅
         FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
                 dirType, fileUploadPath, subFileUploadPath);
-        log.info("[1] member 생성 및 파일 정보 셋팅");
 
         // [2] member info DB 등록
         Member member = baseRepository.save(requestDto.toEntity(fileInfo, "N"));
-        log.info("[2] member info DB 등록" + member);
+        log.info("member info DB insert" + member);
 
         // [3] file transfer
-        file.transferTo(new File(fileInfo.getFilePath()));
-        log.info("[3] file transfer");
+        FileUtil.transferFile(file, fileInfo.getFilePath());
 
-        log.info("member save end");
         return Header.OK(response(member));
     }
 
     @Override
     public Header update(MemberRequestDto requestDto, Long id, MultipartFile file) {
-        log.info("member update start");
         Optional<Member> optional = baseRepository.findById(id);
 
         return optional.map(member -> {
@@ -81,56 +73,42 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
                 // [1] member info DB update
                 member.update(requestDto.toEntity(member.getFileInfo(), member.getSelectYN()));
-                log.info("[1] member info DB update" + member);
+                log.info("member info DB update" + member);
 
                 return Header.OK(response(member));
             }
             // 첨부된 파일이 있는 경우
-            log.info("첨부된 파일 있음");
-
             // [1] member 생성 및 파일 정보 셋팅
             FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
                     dirType, fileUploadPath, subFileUploadPath);
             String preExistingFilePath = member.getFileInfo().getFilePath();
-            log.info("[1] member 생성 및 파일 정보 셋팅");
 
             // [2] member info DB update
             member.update(requestDto.toEntity(fileInfo, member.getSelectYN()));
-            log.info("[2] member info DB update with file" + member);
+            log.info("member info DB update" + member);
 
             // [3] file transfer
-            try {
-                file.transferTo(new File(fileInfo.getFilePath()));
-            } catch (IOException e) {
-                log.info("[3] file transfer fail");
-                e.printStackTrace();
-            }
-            log.info("[3] file transfer");
+            FileUtil.transferFile(file, fileInfo.getFilePath());
 
             // [4] pre-existing file delete
             FileUtil.deleteFile(preExistingFilePath);
-            log.info("[4] pre-existing file delete");
 
-            log.info("member update end");
             return Header.OK(response(member));
         }).orElseThrow(MemberNotFoundException::new);
     }
 
     @Override
     public Header delete(Long id) {
-        log.info("member delete start");
         Optional<Member> optional = baseRepository.findById(id);
 
         return optional.map(member -> {
             // [1] member info DB delete
             baseRepository.delete(member);
-            log.info("[1] member info DB delete" + member);
+            log.info("member info DB delete" + member);
 
             // [2] pre-existing file delete
             FileUtil.deleteFile(member.getFileInfo().getFilePath());
-            log.info("[2] pre-existing file delete");
 
-            log.info("member delete end");
             return Header.OK();
 
         }).orElseThrow(MemberNotFoundException::new);
@@ -139,8 +117,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     @Override
     @Transactional(readOnly = true)
     public Header<MemberResponseDto> findById(Long id) {
-        log.info("member findById start");
-        log.info("member findById end");
         return baseRepository.findById(id)
                 .map((this::response))
                 .map(Header::OK)
@@ -149,7 +125,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
     @Transactional(readOnly = true)
     public Header<List<MemberResponseDto>> findAll(Pageable pageable) {
-        log.info("member findAll start");
         Page<Member> members = baseRepository.findAll(pageable);
 
         List<MemberResponseDto> memberResponseDtoList = members.stream()
@@ -163,14 +138,11 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
                 .currentElements(members.getNumberOfElements())
                 .build();
 
-        log.info("member findAll end");
         return Header.OK(memberResponseDtoList, pagination);
     }
 
     @Transactional(readOnly = true)
     public Header<MemberResponseDto> findBySelectYN() {
-        log.info("member findBySelectYN start");
-        log.info("member findBySelectYN end");
         return baseRepository.findBySelectYN("Y")
                 .map(this::response)
                 .map(Header::OK)
@@ -179,12 +151,9 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
     @Transactional(readOnly = true)
     public Header<MemberTotalInfoResponseDto> totalInfo(Long id) {
-        log.info("member totalInfo start");
-
         // [1] MemberResponseDto 조회
         Member member = baseRepository.findMemberWithSkills(id).orElseThrow(MemberNotFoundException::new);
         MemberResponseDto memberResponseDto = response(member);
-        log.info("[1] MemberResponseDto 조회");
 
         // [2] skillResponseDtoList 조회
         List<Skill> skillList = member.getSkills();
@@ -194,7 +163,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
                     .map(skillService::response)
                     .map(response -> Header.OK(response).getData())
                     .collect(Collectors.toList());
-            log.info("[2] skillResponseDtoList 조회");
         }
 
         // [3] projectResponseDtoList 조회
@@ -204,7 +172,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
             projectResponseDtoList = projectList.stream()
                     .map(projectService::response)
                     .collect(Collectors.toList());
-            log.info("[3] projectResponseDtoList 조회");
         }
 
         // [4] MemberTotalInfoResponseDto SET
@@ -213,9 +180,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
                 .skillResponseDtoList(skillResponseDtoList)
                 .projectResponseDtoList(projectResponseDtoList)
                 .build();
-        log.info("[4] MemberTotalInfoResponseDto SET");
 
-        log.info("member totalInfo end");
         return Header.OK(memberTotalInfoResponseDto);
     }
 

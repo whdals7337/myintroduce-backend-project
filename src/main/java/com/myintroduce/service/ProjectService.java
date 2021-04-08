@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,102 +43,77 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     private final MemberRepository memberRepository;
 
     @Override
-    public Header<ProjectResponseDto> save(ProjectRequestDto requestDto, MultipartFile file) throws IOException {
-        log.info("project save start");
-
+    public Header<ProjectResponseDto> save(ProjectRequestDto requestDto, MultipartFile file) {
         // [1] member 조회
         Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow(MemberNotFoundException::new);
-        log.info("[1] member 조회");
 
         // [2] 파일 정보 셋팅
         FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
                 dirType, fileUploadPath, subFileUploadPath);
-        log.info("[2] 파일 정보 셋팅");
 
         // [3] project info DB 등록
         Project project = baseRepository.save(requestDto.toEntity(fileInfo, member));
-        log.info("[3] project info DB 등록" + project);
+        log.info("project info DB 등록" + project);
 
         // [4] file transfer
-        file.transferTo(new File(fileInfo.getFilePath()));
-        log.info("[4] file transfer");
+        FileUtil.transferFile(file, fileInfo.getFilePath());
 
-        log.info("project save end");
         return Header.OK(response(project));
     }
 
     @Override
     public Header update(ProjectRequestDto requestDto, Long id, MultipartFile file) {
-        log.info("project update start");
         Optional<Project> optional = baseRepository.findById(id);
 
         return optional.map(project -> {
             // 순서 변경
             changeLevel(project.getLevel(), requestDto.getLevel());
-            log.info("[1] 순서 변경");
 
             // [2] member 조회
             Member member = memberRepository.findById(requestDto.getMemberId())
                     .orElseThrow(MemberNotFoundException::new);
-            log.info("[2] member 조회");
 
             // 첨부된 파일이 없는 경우
             if(file == null || file.isEmpty()) {
-                log.info("첨부된 파일 없음");
 
                 // [3] project info DB update
                 project.update(requestDto.toEntity(project.getFileInfo(), member));
-                log.info("[3] project info DB update" + project);
+                log.info("project info DB update" + project);
 
-                log.info("project update end");
                 return Header.OK(response(project));
             }
             // 첨부된 파일이 있는 경우
-            log.info("첨부된 파일 있음");
-
             // [3] 파일 정보 셋팅
             FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
                     dirType, fileUploadPath, subFileUploadPath);
             String preExistingFilePath = project.getFileInfo().getFilePath();
-            log.info("[3] 파일 정보 셋팅");
 
             // [4] project info DB update
             project.update(requestDto.toEntity(fileInfo, member));
-            log.info("[4] project info DB update" + project);
+            log.info("project info DB update" + project);
 
             // [5] file transfer
-            try {
-                file.transferTo(new File(fileInfo.getFilePath()));
-            } catch (IOException e) {
-                log.info("[5] file transfer fail");
-                e.printStackTrace();
-            }
-            log.info("[5] file transfer");
+            FileUtil.transferFile(file, fileInfo.getFilePath());
 
             // [6] pre-existing file delete
             FileUtil.deleteFile(preExistingFilePath);
-            log.info("[6] pre-existing file delete");
 
-            log.info("project update end");
             return Header.OK(response(project));
         }).orElseThrow(ProjectNotFoundException::new);
     }
 
     @Override
     public Header delete(Long id) {
-        log.info("project delete start");
         Optional<Project> optional = baseRepository.findById(id);
 
         return optional.map(project -> {
             // [1] project info DB delete
             baseRepository.delete(project);
-            log.info("[1] project info DB delete");
+            log.info("project info DB delete" + project);
 
             // [2] pre-existing file delete
             FileUtil.deleteFile(project.getFileInfo().getFilePath());
-            log.info("[2] pre-existing file delete");
 
-            log.info("project delete end");
             return Header.OK();
         }).orElseThrow(ProjectNotFoundException::new);
     }
@@ -148,8 +121,6 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     @Override
     @Transactional(readOnly = true)
     public Header<ProjectResponseDto> findById(Long id) {
-        log.info("project findById start");
-        log.info("project findById end");
         return baseRepository.findById(id)
                 .map(this::response)
                 .map(Header::OK)
@@ -159,7 +130,6 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     @Override
     @Transactional(readOnly = true)
     public Header<List<ProjectResponseDto>> findAll(Pageable pageable) {
-        log.info("project findAll start");
         Page<Project> projects = baseRepository.findAll(pageable);
 
         List<ProjectResponseDto> projectResponseDtoList = projects.stream()
@@ -173,7 +143,6 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
                 .currentElements(projects.getNumberOfElements())
                 .build();
 
-        log.info("project findAll end");
         return Header.OK(projectResponseDtoList, pagination);
     }
 
