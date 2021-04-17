@@ -15,6 +15,6 @@ http://ec2-13-125-104-210.ap-northeast-2.compute.amazonaws.com/swagger-ui.html
 
 2021-02-16 - scouter 적용 (apm 도구)
 
-2021-04-18 - redis을 통한 간단한 캐싱 
+2021-04-18 - redis을 통한 간단한 캐싱 적용
 
 ![image](https://user-images.githubusercontent.com/55545105/109240286-90473280-781a-11eb-9bf4-0173e998d0d9.png)
