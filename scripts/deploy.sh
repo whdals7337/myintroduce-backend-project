@@ -35,7 +35,7 @@ echo "> $JAR_NAME 실행"
 nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
     -Dscouter.config=/home/ec2-user/scouter/agent.java/conf/was01.conf \
     -jar \
-    -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
+    -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml,/home/ec2-user/app/application-redis.yml \
     -Dspring.profiles.active=real1 \
     $JAR_NAME > $REPOSITORY/nohup1.out 2>&1 &
 
@@ -76,7 +76,7 @@ do
       nohup java -javaagent:/home/ec2-user/scouter/agent.java/scouter.agent.jar \
           -Dscouter.config=/home/ec2-user/scouter/agent.java/conf/was02.conf \
           -jar \
-          -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml \
+          -Dspring.config.location=classpath:/application.yml,/home/ec2-user/app/application-real-db.yml,/home/ec2-user/app/application-ops.yml,/home/ec2-user/app/application-redis.yml \
           -Dspring.profiles.active=real2 \
           $JAR_NAME > $REPOSITORY/nohup2.out 2>&1 &
       break

@@ -17,6 +17,7 @@ import com.myintroduce.web.dto.skill.SkillResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -142,8 +143,10 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     }
 
     @Transactional(readOnly = true)
-    public Header<MemberResponseDto> findBySelectYN() {
-        return baseRepository.findBySelectYN("Y")
+    @Cacheable(key="#flag", value="findBySelectYN")
+    public Header<MemberResponseDto> findBySelectYN(String flag) {
+        log.info("@@@@@@@@@@ selectYN NO Cache @@@@@@@@@@@@@@@@");
+        return baseRepository.findBySelectYN(flag)
                 .map(this::response)
                 .map(Header::OK)
                 .orElseThrow(MemberNotFoundException::new);

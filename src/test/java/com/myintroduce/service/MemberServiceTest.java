@@ -176,7 +176,7 @@ class MemberServiceTest {
         given(memberRepository.findBySelectYN("Y"))
                 .willReturn(Optional.of(TestUtil.mockMember(1L, "Y")));
 
-        Header<MemberResponseDto> target = memberService.findBySelectYN();
+        Header<MemberResponseDto> target = memberService.findBySelectYN("Y");
 
         assertThat(target.getStatus()).isEqualTo("200");
 
@@ -191,7 +191,7 @@ class MemberServiceTest {
                 .willReturn(Optional.empty());
 
         assertThatExceptionOfType(MemberNotFoundException.class)
-                .isThrownBy(() -> memberService.findBySelectYN())
+                .isThrownBy(() -> memberService.findBySelectYN("Y"))
                 .withMessage("Member Entity가 존재하지 않습니다.");
     }
 

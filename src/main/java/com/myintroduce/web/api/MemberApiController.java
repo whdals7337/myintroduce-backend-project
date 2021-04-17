@@ -25,7 +25,7 @@ public class MemberApiController extends CrudWitFileController<MemberRequestDto,
 
     @ApiOperation(value = "선택된 멤버 정보 조회", notes = "selectYN값이 Y인 멤버의 정보를 조회합니다.")
     @GetMapping("/select")
-    public Header<MemberResponseDto> findBySelectYN() {return memberService.findBySelectYN(); }
+    public Header<MemberResponseDto> findBySelectYN() {return memberService.findBySelectYN("Y"); }
 
     @ApiOperation(value = "멤버 선택", notes = "id값을 통해서 멤버의 selectYN값을 Y값으로 수정합니다.")
     @PatchMapping("/select/{id}")
