@@ -25,7 +25,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
+	implementation 'it.ozimov:embedded-redis:0.7.2'
 	implementation 'com.querydsl:querydsl-jpa'
 
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
