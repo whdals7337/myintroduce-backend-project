@@ -145,7 +145,6 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     @Transactional(readOnly = true)
     @Cacheable(key="#flag", value="findBySelectYN")
     public Header<MemberResponseDto> findBySelectYN(String flag) {
-        log.info("@@@@@@@@@@ selectYN NO Cache @@@@@@@@@@@@@@@@");
         return baseRepository.findBySelectYN(flag)
                 .map(this::response)
                 .map(Header::OK)
