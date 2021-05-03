@@ -2,8 +2,7 @@
 [![Build Status](https://travis-ci.com/whdals7337/myintroduce-backend-project.svg?branch=master)](https://travis-ci.com/whdals7337/myintroduce-backend-project)
 
 
-자기소개 페이지
-http://wellbell.co.kr/  (AWS Educate의 EC2 기간 만료로 인해 Frontend 서비스가 종료 되었습니다)
+자기소개 페이지 (AWS Educate의 EC2 기간 만료로 인해 Frontend 서비스가 종료 되었습니다)
 
 자기소개페이지 개발 과정 블로그 글
 https://wellbell.tistory.com/category/%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%ED%8E%98%EC%9D%B4%EC%A7%80%EB%A7%8C%EB%93%A4%EA%B8%B0
