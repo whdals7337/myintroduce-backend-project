@@ -101,6 +101,8 @@ public class FileController {
         } else if (browser.contains("Safari")) {
             docName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
 
+        } else {
+            throw new RuntimeException("Not supported browser");
         }
         return docName;
     }
