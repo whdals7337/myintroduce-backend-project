@@ -13,8 +13,7 @@ echo "> $JAR_NAME 에 실행권한 추가"
 
 chmod +x $JAR_NAME
 
-pwd
-ls -al
+cd $REPOSITORY/back-end-zip/
 
 echo "> deploy8081.sh 에 실행권한 추가"
 
