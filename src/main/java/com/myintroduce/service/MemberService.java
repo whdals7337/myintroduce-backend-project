@@ -36,10 +36,13 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
     @Value("${file.upload-dir}")
     private String fileUploadPath;
+
     @Value("${server-domain}")
     private String domain;
+
     @Value("${file.images-dir}")
     private String dirType;
+
     @Value("${file.member-dir}")
     private String subFileUploadPath;
 
@@ -49,7 +52,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
     @Override
     public Header<MemberResponseDto> save(MemberRequestDto requestDto, MultipartFile file) {
-        // [1] member 생성 및 파일 정보 셋팅
+        // [1] file parameter setting
         FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
                 dirType, fileUploadPath, subFileUploadPath);
 
@@ -65,54 +68,48 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
     @Override
     public Header update(MemberRequestDto requestDto, Long id, MultipartFile file) {
-        Optional<Member> optional = baseRepository.findById(id);
+        Member member = baseRepository.findById(id)
+                .orElseThrow(MemberNotFoundException::new);
 
-        return optional.map(member -> {
-            // 첨부된 파일이 없는 경우
-            if(file == null || file.isEmpty()) {
-                log.info("첨부된 파일 없음");
-
-                // [1] member info DB update
-                member.update(requestDto.toEntity(member.getFileInfo(), member.getSelectYN()));
-                log.info("member info DB update" + member);
-
-                return Header.OK(response(member));
-            }
-            // 첨부된 파일이 있는 경우
-            // [1] member 생성 및 파일 정보 셋팅
-            FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                    dirType, fileUploadPath, subFileUploadPath);
-            String preExistingFilePath = member.getFileInfo().getFilePath();
-
-            // [2] member info DB update
-            member.update(requestDto.toEntity(fileInfo, member.getSelectYN()));
+        if (file == null || file.isEmpty()) {
+            // [1] member info DB update
+            member.update(requestDto.toEntity(member.getFileInfo(), member.getSelectYN()));
             log.info("member info DB update" + member);
 
-            // [3] file transfer
-            FileUtil.transferFile(file, fileInfo.getFilePath());
-
-            // [4] pre-existing file delete
-            FileUtil.deleteFile(preExistingFilePath);
-
             return Header.OK(response(member));
-        }).orElseThrow(MemberNotFoundException::new);
+        }
+
+        // [1] file parameter setting
+        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                dirType, fileUploadPath, subFileUploadPath);
+        String preExistingFilePath = member.getFileInfo().getFilePath();
+
+        // [2] member info DB update
+        member.update(requestDto.toEntity(fileInfo, member.getSelectYN()));
+        log.info("member info DB update" + member);
+
+        // [3] file transfer
+        FileUtil.transferFile(file, fileInfo.getFilePath());
+
+        // [4] pre-existing file delete
+        FileUtil.deleteFile(preExistingFilePath);
+
+        return Header.OK(response(member));
     }
 
     @Override
     public Header delete(Long id) {
-        Optional<Member> optional = baseRepository.findById(id);
+        Member member = baseRepository.findById(id)
+                .orElseThrow(MemberNotFoundException::new);
 
-        return optional.map(member -> {
-            // [1] member info DB delete
-            baseRepository.delete(member);
-            log.info("member info DB delete" + member);
+        // [1] member info DB delete
+        baseRepository.delete(member);
+        log.info("member info DB delete" + member);
 
-            // [2] pre-existing file delete
-            FileUtil.deleteFile(member.getFileInfo().getFilePath());
+        // [2] pre-existing file delete
+        FileUtil.deleteFile(member.getFileInfo().getFilePath());
 
-            return Header.OK();
-
-        }).orElseThrow(MemberNotFoundException::new);
+        return Header.OK();
     }
 
     @Override
@@ -153,24 +150,25 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
     @Transactional(readOnly = true)
     public Header<MemberTotalInfoResponseDto> totalInfo(Long id) {
-        // [1] MemberResponseDto 조회
-        Member member = baseRepository.findMemberWithSkills(id).orElseThrow(MemberNotFoundException::new);
+        // [1] Member & Skill fetch 조인을 통한 조회
+        Member member = baseRepository.findMemberWithSkills(id)
+                .orElseThrow(MemberNotFoundException::new);
         MemberResponseDto memberResponseDto = response(member);
 
         // [2] skillResponseDtoList 조회
         List<Skill> skillList = member.getSkills();
         List<SkillResponseDto> skillResponseDtoList = null;
-        if(skillList != null) {
+        if(skillList != null && !skillList.isEmpty()) {
             skillResponseDtoList = skillList.stream()
                     .map(skillService::response)
-                    .map(response -> Header.OK(response).getData())
+                    .map(res -> Header.OK(res).getData())
                     .collect(Collectors.toList());
         }
 
         // [3] projectResponseDtoList 조회
         List<Project> projectList = member.getProjects();
         List<ProjectResponseDto> projectResponseDtoList = null;
-        if(projectList != null) {
+        if(projectList != null && !projectList.isEmpty()) {
             projectResponseDtoList = projectList.stream()
                     .map(projectService::response)
                     .collect(Collectors.toList());
@@ -187,18 +185,14 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     }
 
     public Header<MemberResponseDto> updateSelect(Long id){
-        List<Member> memberList = baseRepository.findAll();
-        for(Member member : memberList){
-            member.unSelect();
-        }
-        Member member = baseRepository.findById(id).orElseThrow(MemberNotFoundException::new);
+        Optional<Member> selectedMember = baseRepository.findBySelectYN("Y");
+        selectedMember.ifPresent(Member::unSelect);
+
+        Member member = baseRepository.findById(id)
+                .orElseThrow(MemberNotFoundException::new);
         member.select();
 
         return Header.OK(response(member));
-    }
-
-    public Member getMember(Long id) {
-        return baseRepository.findById(id).orElseThrow(MemberNotFoundException::new);
     }
 
     private MemberResponseDto response(Member member) {

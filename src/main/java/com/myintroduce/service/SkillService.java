@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,7 +47,8 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
     @Override
     public Header<SkillResponseDto> save(SkillRequestDto requestDto, MultipartFile file) {
         // [1] member 조회
-        Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findById(requestDto.getMemberId())
+                .orElseThrow(MemberNotFoundException::new);
 
         // [2] 파일 정보 셋팅
         FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
@@ -66,57 +66,54 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
 
     @Override
     public Header update(SkillRequestDto requestDto, Long id, MultipartFile file) {
-        Optional<Skill> optional = baseRepository.findById(id);
+        Skill skill = baseRepository.findById(id)
+                .orElseThrow(SkillNotFoundException::new);
 
-        return optional.map(skill -> {
+        // [1] member 조회
+        Member member = memberRepository.findById(requestDto.getMemberId())
+                .orElseThrow(MemberNotFoundException::new);
 
-            // [1] member 조회
-            Member member = memberRepository.findById(requestDto.getMemberId())
-                    .orElseThrow(MemberNotFoundException::new);
+        // 첨부된 파일이 없는 경우
+        if(file == null || file.isEmpty()) {
 
-            // 첨부된 파일이 없는 경우
-            if(file == null || file.isEmpty()) {
-
-                // [2] skill info DB update
-                skill.update(requestDto.toEntity(skill.getFileInfo(), member));
-                log.info("skill info DB update" + skill);
-            }
-            // 첨부된 파일이 있는 경우
-            else {
-                // [3] 파일 정보 셋팅
-                FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                        dirType, fileUploadPath, subFileUploadPath);
-                String preExistingFilePath = skill.getFileInfo().getFilePath();
-
-                // [4] skill info DB update
-                skill.update(requestDto.toEntity(fileInfo, member));
-                log.info("skill info DB update" + skill);
-
-                // [5] file transfer
-                FileUtil.transferFile(file, fileInfo.getFilePath());
-
-                // [6] pre-existing file delete
-                FileUtil.deleteFile(preExistingFilePath);
-            }
+            // [2] skill info DB update
+            skill.update(requestDto.toEntity(skill.getFileInfo(), member));
+            log.info("skill info DB update" + skill);
 
             return Header.OK(response(skill));
-        }).orElseThrow(SkillNotFoundException::new);
+        }
+
+        // [3] 파일 정보 셋팅
+        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                dirType, fileUploadPath, subFileUploadPath);
+        String preExistingFilePath = skill.getFileInfo().getFilePath();
+
+        // [4] skill info DB update
+        skill.update(requestDto.toEntity(fileInfo, member));
+        log.info("skill info DB update" + skill);
+
+        // [5] file transfer
+        FileUtil.transferFile(file, fileInfo.getFilePath());
+
+        // [6] pre-existing file delete
+        FileUtil.deleteFile(preExistingFilePath);
+
+        return Header.OK(response(skill));
     }
 
     @Override
     public Header delete(Long id) {
-        Optional<Skill> optional = baseRepository.findById(id);
+        Skill skill = baseRepository.findById(id)
+                .orElseThrow(SkillNotFoundException::new);
 
-        return optional.map(skill -> {
-            // [1] skill info DB delete
-            baseRepository.delete(skill);
-            log.info("skill info DB delete" + skill);
+        // [1] skill info DB delete
+        baseRepository.delete(skill);
+        log.info("skill info DB delete" + skill);
 
-            // [2] pre-existing file delete
-            FileUtil.deleteFile(skill.getFileInfo().getFilePath());
+        // [2] pre-existing file delete
+        FileUtil.deleteFile(skill.getFileInfo().getFilePath());
 
-            return Header.OK();
-        }).orElseThrow(SkillNotFoundException::new);
+        return Header.OK();
     }
 
     @Override
@@ -144,11 +141,6 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
                 .build();
 
         return Header.OK(skillResponseDtoList, pagination);
-    }
-
-    @Transactional(readOnly = true)
-    public Skill getSkill(Long id) {
-        return baseRepository.findById(id).orElseThrow(SkillNotFoundException::new);
     }
 
     public SkillResponseDto response(Skill skill) {

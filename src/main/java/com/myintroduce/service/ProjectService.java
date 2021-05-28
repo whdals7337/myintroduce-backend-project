@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -45,15 +44,16 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
     @Override
     public Header<ProjectResponseDto> save(ProjectRequestDto requestDto, MultipartFile file) {
         // [1] member 조회
-        Member member = memberRepository.findById(requestDto.getMemberId()).orElseThrow(MemberNotFoundException::new);
+        Member member = memberRepository.findById(requestDto.getMemberId())
+                .orElseThrow(MemberNotFoundException::new);
 
-        // [2] 파일 정보 셋팅
+        // [2] file parameter setting
         FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
                 dirType, fileUploadPath, subFileUploadPath);
 
         // [3] project info DB 등록
         Project project = baseRepository.save(requestDto.toEntity(fileInfo, member));
-        log.info("project info DB 등록" + project);
+        log.info("project info DB insert" + project);
 
         // [4] file transfer
         FileUtil.transferFile(file, fileInfo.getFilePath());
@@ -63,59 +63,55 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
 
     @Override
     public Header update(ProjectRequestDto requestDto, Long id, MultipartFile file) {
-        Optional<Project> optional = baseRepository.findById(id);
+        Project project = baseRepository.findById(id)
+                .orElseThrow(ProjectNotFoundException::new);
 
-        return optional.map(project -> {
-            // 순서 변경
-            changeLevel(project.getLevel(), requestDto.getLevel());
+        // [1] 순서 변경
+        changeLevel(project.getLevel(), requestDto.getLevel());
 
-            // [2] member 조회
-            Member member = memberRepository.findById(requestDto.getMemberId())
-                    .orElseThrow(MemberNotFoundException::new);
+        // [2] member 조회
+        Member member = memberRepository.findById(requestDto.getMemberId())
+                .orElseThrow(MemberNotFoundException::new);
 
-            // 첨부된 파일이 없는 경우
-            if(file == null || file.isEmpty()) {
-
-                // [3] project info DB update
-                project.update(requestDto.toEntity(project.getFileInfo(), member));
-                log.info("project info DB update" + project);
-
-                return Header.OK(response(project));
-            }
-            // 첨부된 파일이 있는 경우
-            // [3] 파일 정보 셋팅
-            FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                    dirType, fileUploadPath, subFileUploadPath);
-            String preExistingFilePath = project.getFileInfo().getFilePath();
-
-            // [4] project info DB update
-            project.update(requestDto.toEntity(fileInfo, member));
+        if(file == null || file.isEmpty()) {
+            // [3] project info DB update
+            project.update(requestDto.toEntity(project.getFileInfo(), member));
             log.info("project info DB update" + project);
 
-            // [5] file transfer
-            FileUtil.transferFile(file, fileInfo.getFilePath());
-
-            // [6] pre-existing file delete
-            FileUtil.deleteFile(preExistingFilePath);
-
             return Header.OK(response(project));
-        }).orElseThrow(ProjectNotFoundException::new);
+        }
+
+        // [3] 파일 정보 셋팅
+        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
+                dirType, fileUploadPath, subFileUploadPath);
+        String preExistingFilePath = project.getFileInfo().getFilePath();
+
+        // [4] project info DB update
+        project.update(requestDto.toEntity(fileInfo, member));
+        log.info("project info DB update" + project);
+
+        // [5] file transfer
+        FileUtil.transferFile(file, fileInfo.getFilePath());
+
+        // [6] pre-existing file delete
+        FileUtil.deleteFile(preExistingFilePath);
+
+        return Header.OK(response(project));
     }
 
     @Override
     public Header delete(Long id) {
-        Optional<Project> optional = baseRepository.findById(id);
+        Project project = baseRepository.findById(id)
+                .orElseThrow(ProjectNotFoundException::new);
 
-        return optional.map(project -> {
-            // [1] project info DB delete
-            baseRepository.delete(project);
-            log.info("project info DB delete" + project);
+        // [1] project info DB delete
+        baseRepository.delete(project);
+        log.info("project info DB delete" + project);
 
-            // [2] pre-existing file delete
-            FileUtil.deleteFile(project.getFileInfo().getFilePath());
+        // [2] pre-existing file delete
+        FileUtil.deleteFile(project.getFileInfo().getFilePath());
 
-            return Header.OK();
-        }).orElseThrow(ProjectNotFoundException::new);
+        return Header.OK();
     }
 
     @Override
@@ -144,11 +140,6 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
                 .build();
 
         return Header.OK(projectResponseDtoList, pagination);
-    }
-
-    @Transactional(readOnly = true)
-    public Project getProject(Long id) {
-        return baseRepository.findById(id).orElseThrow(ProjectNotFoundException::new);
     }
 
     public ProjectResponseDto response(Project project) {
