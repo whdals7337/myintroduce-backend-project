@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class FileUtilTest {
 
@@ -47,9 +48,11 @@ class FileUtilTest {
         // then
         String[] split = randomFileName.split("_");
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        assertThat(split[0].matches("^[a-zA-Z]{5}$")).isEqualTo(true);
-        assertThat(split[1].matches("^[0-9]{5}$")).isEqualTo(true);
-        assertThat(split[2]).isEqualTo(now+".txt");
+        assertAll(
+                () -> assertThat(split[0].matches("^[a-zA-Z]{5}$")).isEqualTo(true),
+                () -> assertThat(split[1].matches("^[0-9]{5}$")).isEqualTo(true),
+                () -> assertThat(split[2]).isEqualTo(now+".txt")
+        );
     }
 
     @Test
@@ -67,8 +70,10 @@ class FileUtilTest {
         // then
         String fileUrl = domain + dirType + subFileUploadPath;
         String saveDir = fileUploadPath + subFileUploadPath;
-        assertThat(fileInfo.getFileUrl()).contains(fileUrl);
-        assertThat(fileInfo.getFilePath()).contains(saveDir);
-        assertThat(fileInfo.getFileOriginName()).isEqualTo(originalName);
+        assertAll(
+                () -> assertThat(fileInfo.getFileUrl()).contains(fileUrl),
+                () -> assertThat(fileInfo.getFilePath()).contains(saveDir),
+                () -> assertThat(fileInfo.getFileOriginName()).isEqualTo(originalName)
+        );
     }
 }

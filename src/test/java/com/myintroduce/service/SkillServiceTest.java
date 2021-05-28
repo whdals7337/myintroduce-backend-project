@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -175,49 +176,34 @@ class SkillServiceTest {
         }
 
         Pagination pagination = target.getPagination();
-        assertThat(pagination.getTotalPages()).isEqualTo(1);
-        assertThat(pagination.getTotalElements()).isEqualTo(4);
-        assertThat(pagination.getCurrentPage()).isEqualTo(0);
-        assertThat(pagination.getCurrentElements()).isEqualTo(4);
-    }
-
-    @Test
-    public void getSkill() {
-        Member member = TestUtil.mockMember(1L, "N");
-        Skill skill = mockSkill(member, 1L, 1);
-
-        given(skillRepository.findById(1L)).willReturn(Optional.of(skill));
-
-        Skill target = skillService.getSkill(1L);
-
-        assertThat(target).isEqualTo(skill);
-    }
-
-    @Test
-    public void getSkillNotFoundSkill() {
-        given(skillRepository.findById(1L)).willReturn(Optional.empty());
-
-        assertThatExceptionOfType(SkillNotFoundException.class)
-                .isThrownBy(() -> skillService.getSkill(1L))
-                .withMessage("Skill Entity가 존재하지 않습니다.");
+        assertAll("pagination",
+                () -> assertThat(pagination.getTotalPages()).isEqualTo(1),
+                () -> assertThat(pagination.getTotalElements()).isEqualTo(4),
+                () -> assertThat(pagination.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(pagination.getCurrentElements()).isEqualTo(4)
+        );
     }
 
     private void validAll(SkillResponseDto data, Skill skill) {
-        assertThat(data.getSkillId()).isEqualTo(skill.getId());
-        assertThat(data.getFileOriginName()).isEqualTo(skill.getFileInfo().getFileOriginName());
-        assertThat(data.getFileUrl()).isEqualTo(skill.getFileInfo().getFileUrl());
-        assertThat(data.getSkillLevel()).isEqualTo(skill.getSkillLevel());
-        assertThat(data.getLevel()).isEqualTo(skill.getLevel());
-        assertThat(data.getSkillName()).isEqualTo(skill.getSkillName());
-        assertThat(data.getMemberId()).isEqualTo(skill.getMember().getId());
+        assertAll("skillValidAll",
+                () -> assertThat(data.getSkillId()).isEqualTo(skill.getId()),
+                () -> assertThat(data.getFileOriginName()).isEqualTo(skill.getFileInfo().getFileOriginName()),
+                () -> assertThat(data.getFileUrl()).isEqualTo(skill.getFileInfo().getFileUrl()),
+                () -> assertThat(data.getSkillLevel()).isEqualTo(skill.getSkillLevel()),
+                () -> assertThat(data.getLevel()).isEqualTo(skill.getLevel()),
+                () -> assertThat(data.getSkillName()).isEqualTo(skill.getSkillName()),
+                () -> assertThat(data.getMemberId()).isEqualTo(skill.getMember().getId())
+        );
     }
 
     private void validNotFile(SkillResponseDto data, Skill skill) {
-        assertThat(data.getSkillId()).isEqualTo(skill.getId());
-        assertThat(data.getSkillLevel()).isEqualTo(skill.getSkillLevel());
-        assertThat(data.getLevel()).isEqualTo(skill.getLevel());
-        assertThat(data.getSkillName()).isEqualTo(skill.getSkillName());
-        assertThat(data.getMemberId()).isEqualTo(skill.getMember().getId());
+        assertAll("skillValidNotFile",
+                () -> assertThat(data.getSkillId()).isEqualTo(skill.getId()),
+                () -> assertThat(data.getSkillLevel()).isEqualTo(skill.getSkillLevel()),
+                () -> assertThat(data.getLevel()).isEqualTo(skill.getLevel()),
+                () -> assertThat(data.getSkillName()).isEqualTo(skill.getSkillName()),
+                () -> assertThat(data.getMemberId()).isEqualTo(skill.getMember().getId())
+        );
     }
 
     private SkillRequestDto mockSkillRequestDto(Long memberId, int level) {

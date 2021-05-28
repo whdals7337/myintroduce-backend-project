@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -165,10 +166,12 @@ class MemberServiceTest {
         }
 
         Pagination pagination = target.getPagination();
-        assertThat(pagination.getTotalPages()).isEqualTo(1);
-        assertThat(pagination.getTotalElements()).isEqualTo(4);
-        assertThat(pagination.getCurrentPage()).isEqualTo(0);
-        assertThat(pagination.getCurrentElements()).isEqualTo(4);
+        assertAll("pagination",
+            () -> assertThat(pagination.getTotalPages()).isEqualTo(1),
+            () -> assertThat(pagination.getTotalElements()).isEqualTo(4),
+            () -> assertThat(pagination.getCurrentPage()).isEqualTo(0),
+            () -> assertThat(pagination.getCurrentElements()).isEqualTo(4)
+        );
     }
 
     @Test
@@ -207,10 +210,12 @@ class MemberServiceTest {
 
         MemberResponseDto memberData = data.getMemberResponseDto();
         Member member = TestUtil.mockMember(1L, "N");
-        validAll(memberData, member);
 
-        assertThat(data.getSkillResponseDtoList()).isEmpty();
-        assertThat(data.getProjectResponseDtoList()).isEmpty();
+        assertAll(
+                () -> validAll(memberData, member),
+                () -> assertThat(data.getSkillResponseDtoList()).isNullOrEmpty(),
+                () -> assertThat(data.getProjectResponseDtoList()).isNullOrEmpty()
+        );
     }
 
     @Test
@@ -225,31 +230,34 @@ class MemberServiceTest {
     @Test
     public void updateSelect() {
         Member member = TestUtil.mockMember(1L, "N");
+        Member member2 = TestUtil.mockMember(2L, "Y");
         List<Member> list = new ArrayList<>();
         list.add(member);
-        list.add(TestUtil.mockMember(2L, "Y"));
+        list.add(member2);
         list.add(TestUtil.mockMember(3L, "N"));
 
-        given(memberRepository.findAll()).willReturn(list);
+        given(memberRepository.findBySelectYN("Y")).willReturn(Optional.ofNullable(member2));
         given(memberRepository.findById(1L))
                 .willReturn(Optional.of(member));
 
         memberService.updateSelect(1L);
-
-        assertThat(list.get(0).getSelectYN()).isEqualTo("Y");
-        assertThat(list.get(1).getSelectYN()).isEqualTo("N");
-        assertThat(list.get(2).getSelectYN()).isEqualTo("N");
+        assertAll(
+                () -> assertThat(list.get(0).getSelectYN()).isEqualTo("Y"),
+                () -> assertThat(list.get(1).getSelectYN()).isEqualTo("N"),
+                () -> assertThat(list.get(2).getSelectYN()).isEqualTo("N")
+        );
     }
 
     @Test
     public void updateSelectNotFoundMember() {
         Member member = TestUtil.mockMember(1L, "N");
+        Member member2 = TestUtil.mockMember(2L, "Y");
         List<Member> list = new ArrayList<>();
         list.add(member);
-        list.add(TestUtil.mockMember(2L, "Y"));
+        list.add(member2);
         list.add(TestUtil.mockMember(3L, "N"));
 
-        given(memberRepository.findAll()).willReturn(list);
+        given(memberRepository.findBySelectYN("Y")).willReturn(Optional.ofNullable(member2));
         given(memberRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(MemberNotFoundException.class)
@@ -257,45 +265,30 @@ class MemberServiceTest {
                 .withMessage("Member Entity가 존재하지 않습니다.");
     }
 
-    @Test
-    public void getMember() {
-        Member member = TestUtil.mockMember(1L, "N");
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
-
-        Member target = memberService.getMember(1L);
-
-        assertThat(target).isEqualTo(member);
-    }
-
-    @Test
-    public void getMemberNotFoundMember() {
-        given(memberRepository.findById(1L)).willReturn(Optional.empty());
-
-        assertThatExceptionOfType(MemberNotFoundException.class)
-                .isThrownBy(() -> memberService.getMember(1L))
-                .withMessage("Member Entity가 존재하지 않습니다.");
-    }
-
     private void validAll(MemberResponseDto data, Member member) {
-        assertThat(data.getMemberId()).isEqualTo(member.getId());
-        assertThat(data.getComment()).isEqualTo(member.getComment());
-        assertThat(data.getFileOriginName()).isEqualTo(member.getFileInfo().getFileOriginName());
-        assertThat(data.getFileUrl()).isEqualTo(member.getFileInfo().getFileUrl());
-        assertThat(data.getSubIntroduction()).isEqualTo(member.getSubIntroduction());
-        assertThat(data.getIntroduction()).isEqualTo(member.getIntroduction());
-        assertThat(data.getPhoneNumber()).isEqualTo(member.getPhoneNumber());
-        assertThat(data.getEmail()).isEqualTo(member.getEmail());
-        assertThat(data.getSelectYN()).isEqualTo(member.getSelectYN());
+        assertAll("memberValidAll",
+                () -> assertThat(data.getMemberId()).isEqualTo(member.getId()),
+                () -> assertThat(data.getComment()).isEqualTo(member.getComment()),
+                () -> assertThat(data.getFileOriginName()).isEqualTo(member.getFileInfo().getFileOriginName()),
+                () -> assertThat(data.getFileUrl()).isEqualTo(member.getFileInfo().getFileUrl()),
+                () -> assertThat(data.getSubIntroduction()).isEqualTo(member.getSubIntroduction()),
+                () -> assertThat(data.getIntroduction()).isEqualTo(member.getIntroduction()),
+                () -> assertThat(data.getPhoneNumber()).isEqualTo(member.getPhoneNumber()),
+                () -> assertThat(data.getEmail()).isEqualTo(member.getEmail()),
+                () -> assertThat(data.getSelectYN()).isEqualTo(member.getSelectYN())
+        );
     }
 
     private void validNotFile(MemberResponseDto data, Member member) {
-        assertThat(data.getMemberId()).isEqualTo(member.getId());
-        assertThat(data.getComment()).isEqualTo(member.getComment());
-        assertThat(data.getSubIntroduction()).isEqualTo(member.getSubIntroduction());
-        assertThat(data.getIntroduction()).isEqualTo(member.getIntroduction());
-        assertThat(data.getPhoneNumber()).isEqualTo(member.getPhoneNumber());
-        assertThat(data.getEmail()).isEqualTo(member.getEmail());
-        assertThat(data.getSelectYN()).isEqualTo(member.getSelectYN());
+        assertAll("memberValidNotFile",
+                () -> assertThat(data.getMemberId()).isEqualTo(member.getId()),
+                () -> assertThat(data.getComment()).isEqualTo(member.getComment()),
+                () -> assertThat(data.getSubIntroduction()).isEqualTo(member.getSubIntroduction()),
+                () -> assertThat(data.getIntroduction()).isEqualTo(member.getIntroduction()),
+                () -> assertThat(data.getPhoneNumber()).isEqualTo(member.getPhoneNumber()),
+                () -> assertThat(data.getEmail()).isEqualTo(member.getEmail()),
+                () -> assertThat(data.getSelectYN()).isEqualTo(member.getSelectYN())
+        );
     }
 
     private MemberRequestDto mockMemberRequestDto() {

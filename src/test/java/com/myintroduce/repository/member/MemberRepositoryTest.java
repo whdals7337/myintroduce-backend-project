@@ -68,10 +68,7 @@ class MemberRepositoryTest {
         Member findMember = memberRepository.findMemberWithSkills(expect.getId()).get();
 
         // then
-        // member
         assertThat(findMember).isEqualTo(expect);
-
-        //skill
         assertThat(findMember.getSkills().size()).isEqualTo(2);
 
 

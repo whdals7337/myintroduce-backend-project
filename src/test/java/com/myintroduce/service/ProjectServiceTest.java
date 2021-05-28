@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -196,51 +197,36 @@ class ProjectServiceTest {
         }
 
         Pagination pagination = target.getPagination();
-        assertThat(pagination.getTotalPages()).isEqualTo(1);
-        assertThat(pagination.getTotalElements()).isEqualTo(4);
-        assertThat(pagination.getCurrentPage()).isEqualTo(0);
-        assertThat(pagination.getCurrentElements()).isEqualTo(4);
-    }
-
-    @Test
-    public void getProject() {
-        Member member = TestUtil.mockMember(1L, "N");
-        Project project = mockProject(member, 1L, 1);
-
-        given(projectRepository.findById(1L)).willReturn(Optional.of(project));
-
-        Project target = projectService.getProject(1L);
-
-        assertThat(target).isEqualTo(project);
-    }
-
-    @Test
-    public void getProjectNotFoundProject() {
-        given(projectRepository.findById(1L)).willReturn(Optional.empty());
-
-        assertThatExceptionOfType(ProjectNotFoundException.class)
-                .isThrownBy(() -> projectService.getProject(1L))
-                .withMessage("Project Entity가 존재하지 않습니다.");
+        assertAll("pagination",
+                () -> assertThat(pagination.getTotalPages()).isEqualTo(1),
+                () -> assertThat(pagination.getTotalElements()).isEqualTo(4),
+                () -> assertThat(pagination.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(pagination.getCurrentElements()).isEqualTo(4)
+        );
     }
 
     private void validAll(ProjectResponseDto data, Project project) {
-        assertThat(data.getProjectId()).isEqualTo(project.getId());
-        assertThat(data.getProjectTitle()).isEqualTo(project.getProjectTitle());
-        assertThat(data.getProjectContent()).isEqualTo(project.getProjectContent());
-        assertThat(data.getProjectPostScript()).isEqualTo(project.getProjectPostScript());
-        assertThat(data.getProjectLink()).isEqualTo(project.getProjectLink());
-        assertThat(data.getFileOriginName()).isEqualTo(project.getFileInfo().getFileOriginName());
-        assertThat(data.getFileUrl()).isEqualTo(project.getFileInfo().getFileUrl());
-        assertThat(data.getLevel()).isEqualTo(project.getLevel());
+        assertAll("projectValidAll",
+                () -> assertThat(data.getProjectId()).isEqualTo(project.getId()),
+                () -> assertThat(data.getProjectTitle()).isEqualTo(project.getProjectTitle()),
+                () -> assertThat(data.getProjectContent()).isEqualTo(project.getProjectContent()),
+                () -> assertThat(data.getProjectPostScript()).isEqualTo(project.getProjectPostScript()),
+                () -> assertThat(data.getProjectLink()).isEqualTo(project.getProjectLink()),
+                () -> assertThat(data.getFileOriginName()).isEqualTo(project.getFileInfo().getFileOriginName()),
+                () -> assertThat(data.getFileUrl()).isEqualTo(project.getFileInfo().getFileUrl()),
+                () -> assertThat(data.getLevel()).isEqualTo(project.getLevel())
+        );
     }
 
     private void validNotFile(ProjectResponseDto data, Project project) {
-        assertThat(data.getProjectId()).isEqualTo(project.getId());
-        assertThat(data.getProjectTitle()).isEqualTo(project.getProjectTitle());
-        assertThat(data.getProjectContent()).isEqualTo(project.getProjectContent());
-        assertThat(data.getProjectPostScript()).isEqualTo(project.getProjectPostScript());
-        assertThat(data.getProjectLink()).isEqualTo(project.getProjectLink());
-        assertThat(data.getLevel()).isEqualTo(project.getLevel());
+        assertAll("projectValidAll",
+                () -> assertThat(data.getProjectId()).isEqualTo(project.getId()),
+                () -> assertThat(data.getProjectTitle()).isEqualTo(project.getProjectTitle()),
+                () -> assertThat(data.getProjectContent()).isEqualTo(project.getProjectContent()),
+                () -> assertThat(data.getProjectPostScript()).isEqualTo(project.getProjectPostScript()),
+                () -> assertThat(data.getProjectLink()).isEqualTo(project.getProjectLink()),
+                () -> assertThat(data.getLevel()).isEqualTo(project.getLevel())
+        );
     }
 
     private ProjectRequestDto mockProjectRequestDto (Long memberId, int level) {
