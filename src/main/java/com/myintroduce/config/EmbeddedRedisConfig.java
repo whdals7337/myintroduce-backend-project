@@ -50,7 +50,7 @@ public class EmbeddedRedisConfig {
         return new WindowStrategy();
     }
 
-    @Profile("test")
+    @Profile({"test", "ops"})
     @Bean
     public OSStrategy linuxStrategy() {
         return new LinuxStrategy();
