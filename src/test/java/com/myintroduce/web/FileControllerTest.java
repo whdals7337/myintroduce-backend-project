@@ -142,6 +142,43 @@ class FileControllerTest {
                 .andExpect(content().string(containsString("Hello, World!")));
     }
 
+    @Test
+    public void download_no_support_browser() throws Exception {
+        MockMultipartFile testFile
+                = new MockMultipartFile(
+                "file",
+                "hello.txt",
+                MediaType.TEXT_PLAIN_VALUE,
+                "Hello, World!".getBytes()
+        );
+        String comment = "코멘트 영역 입니다.";
+        String sub_introduction = "서브 자기소개 영역입니다.";
+        String introduction = "자기소개 영역입니다.";
+        String phone_number = "010-1111-1111";
+        String email = "uok0201@gmail.com";
+
+        String url = "http://localhost:" + port + "/api/member";
+
+        this.mockMvc.perform(multipart(url)
+                .file(testFile)
+                .header("Authorization", "Bearer "+token)
+                .param("comment", comment)
+                .param("subIntroduction", sub_introduction)
+                .param("introduction", introduction)
+                .param("phoneNumber", phone_number)
+                .param("email", email));
+
+        List<Member> all = memberRepository.findAll();
+
+        Member member = all.get(0);
+
+        String fileUrl = "http://localhost:" + port + "/download/member/" + member.getId();
+
+        mockMvc.perform(get(fileUrl)
+                .header("Authorization", "Bearer "+token))
+                .andExpect(status().isBadRequest());
+    }
+
     public Member givenMember() {
         return memberRepository.save(Member.builder()
                 .comment("코멘트")
