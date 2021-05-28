@@ -23,7 +23,7 @@ echo "> 8081포트에 애플리케이션 배포 시작"
 
 ./deploy8081.sh
 
-sleep 10
+sleep 20
 
 echo "> health.sh 에 실행권한 추가"
 
