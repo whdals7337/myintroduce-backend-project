@@ -2,6 +2,7 @@ package com.myintroduce.error;
 
 import com.myintroduce.error.exception.file.FileNotRequestException;
 import com.myintroduce.error.exception.file.FileNotTransferException;
+import com.myintroduce.error.exception.file.NoSupportedBrowserException;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.error.exception.project.ProjectNotFoundException;
 import com.myintroduce.error.exception.session.LoginInfoWrongException;
@@ -95,6 +96,12 @@ public class ErrorController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(LoginInfoWrongException.class)
     public ErrorMsg handleLoginInfoWrongException(LoginInfoWrongException e) {
+        return new ErrorMsg(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NoSupportedBrowserException.class)
+    public ErrorMsg handleNoSupportedBrowserException(NoSupportedBrowserException e) {
         return new ErrorMsg(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
