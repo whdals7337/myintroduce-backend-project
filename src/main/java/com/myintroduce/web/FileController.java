@@ -3,9 +3,13 @@ package com.myintroduce.web;
 import com.myintroduce.domain.entity.member.Member;
 import com.myintroduce.domain.entity.project.Project;
 import com.myintroduce.domain.entity.skill.Skill;
-import com.myintroduce.service.MemberService;
-import com.myintroduce.service.ProjectService;
-import com.myintroduce.service.SkillService;
+import com.myintroduce.error.exception.file.NoSupportedBrowserException;
+import com.myintroduce.error.exception.member.MemberNotFoundException;
+import com.myintroduce.error.exception.project.ProjectNotFoundException;
+import com.myintroduce.error.exception.skill.SkillNotFoundException;
+import com.myintroduce.repository.member.MemberRepository;
+import com.myintroduce.repository.project.ProjectRepository;
+import com.myintroduce.repository.skill.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -31,34 +35,35 @@ import java.util.Enumeration;
 @RestController
 public class FileController {
 
-    private final MemberService memberService;
-    private final ProjectService projectService;
-    private final SkillService skillService;
+    private final MemberRepository memberRepository;
+
+    private final ProjectRepository projectRepository;
+
+    private final SkillRepository skillRepository;
 
     @GetMapping("/download/{type}/{id}")
-    public ResponseEntity<Resource> fileDownload(@PathVariable String type, @PathVariable("id") Long id, HttpServletRequest request) throws IOException {
-        String filePath;
-        String filename;
+    public ResponseEntity<Resource> fileDownload(@PathVariable String type,
+                                                 @PathVariable("id") Long id,
+                                                 HttpServletRequest request) throws IOException {
+        String filePath = null;
+        String filename = null;
 
         switch (type) {
             case "member" :
-                Member member = memberService.getMember(id);
+                Member member = memberRepository.findById(id).orElseThrow(MemberNotFoundException::new);
                 filePath =  member.getFileInfo().getFilePath();
                 filename =  member.getFileInfo().getFileOriginName();
                 break;
             case "project" :
-                Project project = projectService.getProject(id);
+                Project project = projectRepository.findById(id).orElseThrow(ProjectNotFoundException::new);
                 filePath = project.getFileInfo().getFilePath();
                 filename = project.getFileInfo().getFileOriginName();
                 break;
             case "skill" :
-                Skill skill = skillService.getSkill(id);
+                Skill skill = skillRepository.findById(id).orElseThrow(SkillNotFoundException::new);
                 filePath = skill.getFileInfo().getFilePath();
                 filename = skill.getFileInfo().getFileOriginName();
                 break;
-            default:
-                filePath = null;
-                filename = null;
         }
 
         if(filePath != null && filename != null){
@@ -75,7 +80,8 @@ public class FileController {
         }
     }
 
-    protected String getFileNameByBrowser(String fileName, HttpServletRequest request) throws UnsupportedEncodingException {
+    protected String getFileNameByBrowser(String fileName, HttpServletRequest request)
+            throws UnsupportedEncodingException, NoSupportedBrowserException {
         String browser= "";
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
@@ -102,7 +108,7 @@ public class FileController {
             docName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
 
         } else {
-            throw new RuntimeException("Not supported browser");
+            throw new NoSupportedBrowserException();
         }
         return docName;
     }
