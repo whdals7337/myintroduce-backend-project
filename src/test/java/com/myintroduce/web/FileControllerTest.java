@@ -127,7 +127,8 @@ class FileControllerTest {
                 .param("subIntroduction", sub_introduction)
                 .param("introduction", introduction)
                 .param("phoneNumber", phone_number)
-                .param("email", email));
+                .param("email", email))
+                .andExpect(status().isOk());
 
         List<Member> all = memberRepository.findAll();
 
@@ -166,7 +167,8 @@ class FileControllerTest {
                 .param("subIntroduction", sub_introduction)
                 .param("introduction", introduction)
                 .param("phoneNumber", phone_number)
-                .param("email", email));
+                .param("email", email))
+                .andExpect(status().isOk());
 
         List<Member> all = memberRepository.findAll();
 
@@ -182,7 +184,7 @@ class FileControllerTest {
     public Member givenMember() {
         return memberRepository.save(Member.builder()
                 .comment("코멘트")
-                .fileInfo(new FileInfo("헤더 이미지 원본 이름","파일 주소"))
+                .fileInfo(new FileInfo("헤더 이미지 원본 이름","파일 주소.com/qwe"))
                 .subIntroduction("서브 자기소개")
                 .introduction("자기소개")
                 .phoneNumber("연락처")

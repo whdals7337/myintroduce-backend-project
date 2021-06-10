@@ -476,7 +476,7 @@ class MemberApiControllerTest {
     private Skill givenSkill(Member member) {
         return skillRepository.save(Skill.builder()
                 .skillName("스킬 이름0")
-                .fileInfo(new FileInfo( "스킬 이미지 이름0", member.getFileInfo().getFileUrl()))
+                .fileInfo(new FileInfo( "스킬 이미지 이름0", "주소.com/fwe"))
                 .skillLevel(3)
                 .level(1)
                 .member(member)
