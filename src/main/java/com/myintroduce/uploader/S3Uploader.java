@@ -20,7 +20,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-@Profile("dev")
+@Profile("ops")
 public class S3Uploader implements Uploader {
 
     private final AmazonS3Client amazonS3Client;
