@@ -1,7 +1,7 @@
 spring:
   #profiles
   profiles:
-    include: test, redis
+    include: test, redis, s3
 
     #console color
   output:
