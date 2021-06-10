@@ -13,12 +13,11 @@ cache:
     - '$HOME/.gradle'
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_edf801d58259_key -iv $encrypted_edf801d58259_iv
-    -in s3info.tar.enc -out s3info.tar -d
+  - openssl aes-256-cbc -K $encrypted_f4314cc5f076_key -iv $encrypted_f4314cc5f076_iv
+    -in application-s3.yml.enc -out application-s3.yml -d
   - sudo mkdir -p /test-dir/files
   - sudo chmod 777 /test-dir/files
   - chmod +x gradlew
-  - tar xvf s3info.tar
 
 script: "./gradlew clean build"
 
