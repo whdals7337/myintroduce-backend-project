@@ -68,7 +68,7 @@ class ProjectRepositoryTest {
     public Member givenMember() {
         return memberRepository.save(Member.builder()
                 .comment("페이지 탑 영역 내용 부분입니다.")
-                .fileInfo(new FileInfo("헤더 이미지 경로","헤더 이미지 원본 이름","파일 주소"))
+                .fileInfo(new FileInfo("헤더 이미지 원본 이름","파일 주소"))
                 .subIntroduction("자기소개 서브 내용 부분입니다.")
                 .introduction("자기소개 내용 부분입니다.")
                 .phoneNumber("010-1111-1111")
@@ -82,7 +82,7 @@ class ProjectRepositoryTest {
                 .projectTitle("프로젝트 이름")
                 .projectContent("프로젝트는 Spring4 + angularJs를 기반으로 개발된 프로젝트입니다.")
                 .projectPostScript("#Spring #angularJs #현장실습")
-                .fileInfo(new FileInfo("경로","이름","주소"))
+                .fileInfo(new FileInfo("이름","주소"))
                 .projectLink("http://aergaerg")
                 .level(level)
                 .member(member)

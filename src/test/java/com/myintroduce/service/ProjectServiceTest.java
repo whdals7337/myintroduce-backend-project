@@ -8,6 +8,7 @@ import com.myintroduce.domain.network.Pagination;
 import com.myintroduce.error.exception.project.ProjectNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.repository.project.ProjectRepository;
+import com.myintroduce.uploader.Uploader;
 import com.myintroduce.web.dto.project.ProjectRequestDto;
 import com.myintroduce.web.dto.project.ProjectResponseDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,17 +39,17 @@ class ProjectServiceTest {
     @InjectMocks
     private ProjectService projectService;
     @Mock
+    private Uploader uploader;
+    @Mock
     private MemberRepository memberRepository;
     @Mock
     private ProjectRepository projectRepository;
 
     @BeforeEach
     public void setUp() {
-        projectService = new ProjectService(memberRepository);
+        projectService = new ProjectService(uploader, memberRepository);
         projectService.baseRepository = projectRepository;
-        ReflectionTestUtils.setField(projectService, "fileUploadPath","/test-dir/files/");
-        ReflectionTestUtils.setField(projectService, "domain", "http://localhost:8080");
-        ReflectionTestUtils.setField(projectService, "dirType", "images");
+        ReflectionTestUtils.setField(projectService, "fileUploadPath","test");
         ReflectionTestUtils.setField(projectService, "subFileUploadPath", "project");
     }
 
@@ -69,7 +70,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void updateWithFile() {
+    public void updateWithFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(projectRepository.findById(1L)).willReturn(Optional.of(mockProject(member, 1L, 1)));
@@ -86,7 +87,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void updateWithoutFile() {
+    public void updateWithoutFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(projectRepository.findById(1L)).willReturn(Optional.of(mockProject(member, 1L, 1)));
@@ -102,7 +103,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void updateDiffLevel() {
+    public void updateDiffLevel() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
         List<Project> list = new ArrayList<>();
         list.add(mockProject(member, 2L, 2));
@@ -246,7 +247,7 @@ class ProjectServiceTest {
                 .projectTitle("projectTitle")
                 .projectContent("projectContent")
                 .projectPostScript("projectPostScript")
-                .fileInfo(new FileInfo("filePath", "fileOriginName", "fileUrl"))
+                .fileInfo(new FileInfo( "fileOriginName", "fileUrl"))
                 .projectLink("projectLink")
                 .level(level)
                 .member(member)

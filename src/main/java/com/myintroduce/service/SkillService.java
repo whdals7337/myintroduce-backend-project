@@ -9,6 +9,7 @@ import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.error.exception.skill.SkillNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.repository.skill.SkillRepository;
+import com.myintroduce.uploader.Uploader;
 import com.myintroduce.utill.FileUtil;
 import com.myintroduce.web.dto.skill.SkillRequestDto;
 import com.myintroduce.web.dto.skill.SkillResponseDto;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,41 +35,45 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
     @Value("${file.upload-dir}")
     private String fileUploadPath;
 
-    @Value("${server-domain}")
-    private String domain;
-
-    @Value("${file.images-dir}")
-    private String dirType;
-
     @Value("${file.skill-dir}")
     private String subFileUploadPath;
+
+    private final Uploader uploader;
 
     private final MemberRepository memberRepository;
 
     @Override
-    public Header<SkillResponseDto> save(SkillRequestDto requestDto, MultipartFile file) {
+    public Header<SkillResponseDto> save(SkillRequestDto requestDto, MultipartFile file) throws IOException {
         // [1] member 조회
         Member member = memberRepository.findById(requestDto.getMemberId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        // [2] 파일 정보 셋팅
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                dirType, fileUploadPath, subFileUploadPath);
+        String fileUrl ="";
+        try {
+            // [2] file upload to S3
+            fileUrl = uploader.upload(file, fileUploadPath + "/" + subFileUploadPath);
+            FileInfo fileInfo = new FileInfo(FileUtil.cutFileName(file.getOriginalFilename(), 100), fileUrl);
 
-        // [3] project info DB 등록
-        Skill skill = baseRepository.save(requestDto.toEntity(fileInfo, member));
-        log.info("skill info DB insert" + skill);
+            // [3] project info DB 등록
+            Skill skill = baseRepository.save(requestDto.toEntity(fileInfo, member));
+            log.info("skill info DB insert" + skill);
 
-        // [4] file transfer
-        FileUtil.transferFile(file, fileInfo.getFilePath());
+            return Header.OK(response(skill));
 
-        return Header.OK(response(skill));
+        } catch (Exception e) {
+            log.debug("s3에 저장되었던 skill 파일 삭제");
+            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            throw e;
+        }
     }
 
     @Override
-    public Header update(SkillRequestDto requestDto, Long id, MultipartFile file) {
+    public Header update(SkillRequestDto requestDto, Long id, MultipartFile file) throws IOException {
         Skill skill = baseRepository.findById(id)
                 .orElseThrow(SkillNotFoundException::new);
+
+        String fileUrl ="";
+        String preExistingFileUrl = skill.getFileInfo().getFileUrl();
 
         // [1] member 조회
         Member member = memberRepository.findById(requestDto.getMemberId())
@@ -83,20 +89,23 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
             return Header.OK(response(skill));
         }
 
-        // [3] 파일 정보 셋팅
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                dirType, fileUploadPath, subFileUploadPath);
-        String preExistingFilePath = skill.getFileInfo().getFilePath();
+        try {
+            // [2] file upload to S3
+            fileUrl = uploader.upload(file, fileUploadPath + "/" + subFileUploadPath);
+            FileInfo fileInfo = new FileInfo(FileUtil.cutFileName(file.getOriginalFilename(), 100), fileUrl);
 
-        // [4] skill info DB update
-        skill.update(requestDto.toEntity(fileInfo, member));
-        log.info("skill info DB update" + skill);
+            // [4] skill info DB update
+            skill.update(requestDto.toEntity(fileInfo, member));
+            log.info("skill info DB update" + skill);
 
-        // [5] file transfer
-        FileUtil.transferFile(file, fileInfo.getFilePath());
+        } catch (Exception e) {
+            log.debug("s3에 저장되었던 project 파일 삭제");
+            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            throw e;
+        }
 
-        // [6] pre-existing file delete
-        FileUtil.deleteFile(preExistingFilePath);
+        // [5] pre-existing file delete
+        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
 
         return Header.OK(response(skill));
     }
@@ -111,7 +120,8 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
         log.info("skill info DB delete" + skill);
 
         // [2] pre-existing file delete
-        FileUtil.deleteFile(skill.getFileInfo().getFilePath());
+        String preExistingFileUrl = skill.getFileInfo().getFileUrl();
+        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
 
         return Header.OK();
     }

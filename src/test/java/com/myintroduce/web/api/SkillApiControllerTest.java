@@ -138,7 +138,7 @@ class SkillApiControllerTest {
         for(int i = 1; i < 5; i++){
             Skill skill = skillRepository.save(Skill.builder()
                     .skillName("스킬 이름0" + i)
-                    .fileInfo(new FileInfo("스킬 이미지 경로0" + i, "스킬 이미지 이름0" + i, "파일 주소"))
+                    .fileInfo(new FileInfo( "스킬 이미지 이름0" + i, "파일 주소"))
                     .skillLevel(3)
                     .level(i)
                     .member(member)
@@ -207,7 +207,7 @@ class SkillApiControllerTest {
         for(int i = 1; i < 5; i++){
             Skill skill = skillRepository.save(Skill.builder()
                     .skillName("스킬 이름0" + i)
-                    .fileInfo(new FileInfo("스킬 이미지 경로0" + i, "스킬 이미지 이름0" + i, "파일 주소"))
+                    .fileInfo(new FileInfo( "스킬 이미지 이름0" + i, "파일 주소"))
                     .skillLevel(3)
                     .level(i)
                     .member(member)
@@ -255,7 +255,6 @@ class SkillApiControllerTest {
         Skill target = skillRepository.findById(updateId).get();
         assertThat(target.getSkillName()).isEqualTo(expectedSkillName);
         assertThat(target.getFileInfo().getFileOriginName()).isEqualTo(expectedSkill.getFileInfo().getFileOriginName());
-        assertThat(target.getFileInfo().getFilePath()).isEqualTo(expectedSkill.getFileInfo().getFilePath());
         assertThat(target.getFileInfo().getFileUrl()).isEqualTo(expectedSkill.getFileInfo().getFileUrl());
         assertThat(target.getSkillLevel()).isEqualTo(expectedSkillLevel);
         assertThat(target.getLevel()).isEqualTo(expectedLevel);
@@ -359,7 +358,7 @@ class SkillApiControllerTest {
     private Member givenMember() {
         return memberRepository.save(Member.builder()
                 .comment("코멘트")
-                .fileInfo(new FileInfo("헤어 이미지 경로", "헤더 이미지 원본 이름", "파일 경로"))
+                .fileInfo(new FileInfo( "헤더 이미지 원본 이름", "파일 경로.com/qwe"))
                 .subIntroduction("서브 자기소개")
                 .introduction("자기소개")
                 .phoneNumber("연락처")
@@ -371,7 +370,7 @@ class SkillApiControllerTest {
     private Skill givenSkill(Member member) {
         return skillRepository.save(Skill.builder()
                 .skillName("스킬 이름0")
-                .fileInfo(new FileInfo("스킬 이미지 경로0", "스킬 이미지 이름0", member.getFileInfo().getFileUrl()))
+                .fileInfo(new FileInfo( "스킬 이미지 이름0", member.getFileInfo().getFileUrl()))
                 .skillLevel(3)
                 .level(1)
                 .member(member)

@@ -9,6 +9,7 @@ import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.error.exception.project.ProjectNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.repository.project.ProjectRepository;
+import com.myintroduce.uploader.Uploader;
 import com.myintroduce.utill.FileUtil;
 import com.myintroduce.web.dto.project.ProjectRequestDto;
 import com.myintroduce.web.dto.project.ProjectResponseDto;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,39 +34,46 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
 
     @Value("${file.upload-dir}")
     private String fileUploadPath;
-    @Value("${server-domain}")
-    private String domain;
-    @Value("${file.images-dir}")
-    private String dirType;
+
     @Value("${file.project-dir}")
     private String subFileUploadPath;
+
+    private final Uploader uploader;
 
     private final MemberRepository memberRepository;
 
     @Override
-    public Header<ProjectResponseDto> save(ProjectRequestDto requestDto, MultipartFile file) {
+    public Header<ProjectResponseDto> save(ProjectRequestDto requestDto, MultipartFile file) throws IOException {
         // [1] member 조회
         Member member = memberRepository.findById(requestDto.getMemberId())
                 .orElseThrow(MemberNotFoundException::new);
 
-        // [2] file parameter setting
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                dirType, fileUploadPath, subFileUploadPath);
+        String fileUrl ="";
+        try {
+            // [2] file upload to S3
+            fileUrl = uploader.upload(file, fileUploadPath + "/" + subFileUploadPath);
+            FileInfo fileInfo = new FileInfo(FileUtil.cutFileName(file.getOriginalFilename(), 100), fileUrl);
 
-        // [3] project info DB 등록
-        Project project = baseRepository.save(requestDto.toEntity(fileInfo, member));
-        log.info("project info DB insert" + project);
+            // [3] project info DB 등록
+            Project project = baseRepository.save(requestDto.toEntity(fileInfo, member));
+            log.info("project info DB insert" + project);
 
-        // [4] file transfer
-        FileUtil.transferFile(file, fileInfo.getFilePath());
+            return Header.OK(response(project));
 
-        return Header.OK(response(project));
+        } catch (Exception e) {
+            log.debug("s3에 저장되었던 project 파일 삭제");
+            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            throw e;
+        }
     }
 
     @Override
-    public Header update(ProjectRequestDto requestDto, Long id, MultipartFile file) {
+    public Header update(ProjectRequestDto requestDto, Long id, MultipartFile file) throws IOException {
         Project project = baseRepository.findById(id)
                 .orElseThrow(ProjectNotFoundException::new);
+
+        String fileUrl ="";
+        String preExistingFileUrl = project.getFileInfo().getFileUrl();
 
         // [1] 순서 변경
         changeLevel(project.getLevel(), requestDto.getLevel());
@@ -81,20 +90,23 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
             return Header.OK(response(project));
         }
 
-        // [3] 파일 정보 셋팅
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                dirType, fileUploadPath, subFileUploadPath);
-        String preExistingFilePath = project.getFileInfo().getFilePath();
+        try {
+            // [3] file upload to S3
+            fileUrl = uploader.upload(file, fileUploadPath + "/" + subFileUploadPath);
+            FileInfo fileInfo = new FileInfo(FileUtil.cutFileName(file.getOriginalFilename(), 100), fileUrl);
 
-        // [4] project info DB update
-        project.update(requestDto.toEntity(fileInfo, member));
-        log.info("project info DB update" + project);
+            // [4] project info DB update
+            project.update(requestDto.toEntity(fileInfo, member));
+            log.info("project info DB update" + project);
 
-        // [5] file transfer
-        FileUtil.transferFile(file, fileInfo.getFilePath());
+        } catch (Exception e) {
+            log.debug("s3에 저장되었던 project 파일 삭제");
+            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            throw e;
+        }
 
-        // [6] pre-existing file delete
-        FileUtil.deleteFile(preExistingFilePath);
+        // [5] pre-existing file delete
+        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
 
         return Header.OK(response(project));
     }
@@ -109,7 +121,8 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
         log.info("project info DB delete" + project);
 
         // [2] pre-existing file delete
-        FileUtil.deleteFile(project.getFileInfo().getFilePath());
+        String preExistingFileUrl = project.getFileInfo().getFileUrl();
+        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
 
         return Header.OK();
     }

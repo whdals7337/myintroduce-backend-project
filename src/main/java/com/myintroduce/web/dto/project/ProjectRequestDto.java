@@ -39,7 +39,7 @@ public class ProjectRequestDto {
                 .projectTitle(projectTitle)
                 .projectContent(projectContent)
                 .projectPostScript(projectPostScript)
-                .fileInfo(new FileInfo(fileInfo.getFilePath(), fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
+                .fileInfo(new FileInfo(fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
                 .projectLink(projectLink)
                 .level(level)
                 .member(member)

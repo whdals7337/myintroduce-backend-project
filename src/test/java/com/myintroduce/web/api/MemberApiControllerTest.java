@@ -237,7 +237,6 @@ class MemberApiControllerTest {
         Member target = memberRepository.findById(updateId).get();
         assertThat(target.getComment()).isEqualTo(expectedComment);
         assertThat(target.getFileInfo().getFileOriginName()).isEqualTo(member.getFileInfo().getFileOriginName());
-        assertThat(target.getFileInfo().getFilePath()).isEqualTo(member.getFileInfo().getFilePath());
         assertThat(target.getFileInfo().getFileUrl()).isEqualTo(member.getFileInfo().getFileUrl());
         assertThat(target.getSubIntroduction()).isEqualTo(expectedSubIntroduction);
         assertThat(target.getIntroduction()).isEqualTo(expectedIntroduction);
@@ -441,7 +440,7 @@ class MemberApiControllerTest {
     private Member givenMember(String selectYN) {
         return memberRepository.save(Member.builder()
                 .comment("코멘트")
-                .fileInfo(new FileInfo("헤어 이미지 경로", "헤더 이미지 원본 이름", "파일 경로"))
+                .fileInfo(new FileInfo( "헤더 이미지 원본 이름", "파일 경로.com/qwe"))
                 .subIntroduction("서브 자기소개")
                 .introduction("자기소개")
                 .phoneNumber("연락처")
@@ -453,7 +452,7 @@ class MemberApiControllerTest {
     private Member givenMember() {
         return memberRepository.save(Member.builder()
                 .comment("코멘트")
-                .fileInfo(new FileInfo("헤어 이미지 경로", "헤더 이미지 원본 이름", "파일 경로"))
+                .fileInfo(new FileInfo( "헤더 이미지 원본 이름", "파일 경로.com/qwe"))
                 .subIntroduction("서브 자기소개")
                 .introduction("자기소개")
                 .phoneNumber("연락처")
@@ -467,7 +466,7 @@ class MemberApiControllerTest {
                 .projectTitle("프로젝트 이름0")
                 .projectContent("프로젝트 내용0")
                 .projectPostScript("프로젝트 추신0")
-                .fileInfo(new FileInfo("프로젝트 이미지 경로0", "프로젝트 이미지 원본이름0", "파일주소"))
+                .fileInfo(new FileInfo( "프로젝트 이미지 원본이름0", "파일주소.com/qwe"))
                 .projectLink("http://gergerg")
                 .level(1)
                 .member(member)
@@ -477,7 +476,7 @@ class MemberApiControllerTest {
     private Skill givenSkill(Member member) {
         return skillRepository.save(Skill.builder()
                 .skillName("스킬 이름0")
-                .fileInfo(new FileInfo("스킬 이미지 경로0", "스킬 이미지 이름0", member.getFileInfo().getFileUrl()))
+                .fileInfo(new FileInfo( "스킬 이미지 이름0", member.getFileInfo().getFileUrl()))
                 .skillLevel(3)
                 .level(1)
                 .member(member)

@@ -33,7 +33,7 @@ public class MemberRequestDto {
     public Member toEntity(FileInfo fileInfo, String selectYN) {
         return  Member.builder()
                 .comment(comment)
-                .fileInfo(new FileInfo(fileInfo.getFilePath(), fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
+                .fileInfo(new FileInfo(fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
                 .subIntroduction(subIntroduction)
                 .introduction(introduction)
                 .phoneNumber(phoneNumber)

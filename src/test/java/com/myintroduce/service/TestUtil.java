@@ -11,7 +11,7 @@ public class TestUtil {
         return Member.builder()
                 .id(id)
                 .comment("comment")
-                .fileInfo(new FileInfo("filePath", "hello.txt", "fileUrl"))
+                .fileInfo(new FileInfo("hello.txt", "fileUrl.com/qwe"))
                 .subIntroduction("subIntroduction")
                 .introduction("introduction")
                 .phoneNumber("phoneNumber")

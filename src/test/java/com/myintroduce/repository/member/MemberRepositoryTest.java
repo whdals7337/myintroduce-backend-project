@@ -51,14 +51,14 @@ class MemberRepositoryTest {
                 .skillName("skillName")
                 .skillLevel(1)
                 .level(1)
-                .fileInfo(new FileInfo("filepath","name","url"))
+                .fileInfo(new FileInfo("name","url"))
                 .member(expect)
                 .build();
         Skill skill2 = Skill.builder()
                 .skillName("skillName")
                 .skillLevel(1)
                 .level(1)
-                .fileInfo(new FileInfo("filepath","name","url"))
+                .fileInfo(new FileInfo("name","url"))
                 .member(expect)
                 .build();
         skillRepository.save(skill1);
@@ -77,7 +77,7 @@ class MemberRepositoryTest {
     public Member givenMember(String selectYN) {
         return Member.builder()
                 .comment("페이지 탑 영역 내용 부분입니다.")
-                .fileInfo(new FileInfo("헤더 이미지 경로","헤더 이미지 원본 이름","파일 주소"))
+                .fileInfo(new FileInfo("헤더 이미지 원본 이름","파일 주소"))
                 .subIntroduction("자기소개 서브 내용 부분입니다.")
                 .introduction("자기소개 내용 부분입니다.")
                 .phoneNumber("010-1111-1111")

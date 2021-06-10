@@ -11,12 +11,9 @@ spring:
     max-file-size: 200MB
     .max-request-size: 215MB
 
-#domain
-server-domain: http://localhost:8080
 
 file:
-  upload-dir: /test-dir/files/
-  images-dir: images
+  upload-dir: test
   member-dir: member
   project-dir: project
   skill-dir: skill
@@ -25,5 +22,16 @@ file:
 jwt:
   signature: 12345678901234567890123456789012
 
+cloud:
+  aws:
+    credentials:
+      accessKey: $ACCESS_KEY_ID
+      secretKey: $SECRET_ACCESS_KEY
+    s3:
+      bucket: myintroduce-springboot-build
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
 
     

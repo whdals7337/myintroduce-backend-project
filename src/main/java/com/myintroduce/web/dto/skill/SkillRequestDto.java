@@ -30,7 +30,7 @@ public class SkillRequestDto {
     public Skill toEntity(FileInfo fileInfo, Member member) {
         return Skill.builder()
                 .skillName(skillName)
-                .fileInfo(new FileInfo(fileInfo.getFilePath(), fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
+                .fileInfo(new FileInfo(fileInfo.getFileOriginName(), fileInfo.getFileUrl()))
                 .skillLevel(skillLevel)
                 .level(level)
                 .member(member)

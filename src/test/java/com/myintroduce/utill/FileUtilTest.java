@@ -54,26 +54,4 @@ class FileUtilTest {
                 () -> assertThat(split[2]).isEqualTo(now+".txt")
         );
     }
-
-    @Test
-    public void getFileInfo_test() {
-        // given
-        String originalName = "파일이름.txt";
-        String domain = "http://localhost:8080/";
-        String dirType = "images/";
-        String fileUploadPath = "C:/";
-        String subFileUploadPath = "member/";
-
-        // when
-        FileInfo fileInfo = FileUtil.getFileInfo(originalName, domain, dirType, fileUploadPath, subFileUploadPath);
-
-        // then
-        String fileUrl = domain + dirType + subFileUploadPath;
-        String saveDir = fileUploadPath + subFileUploadPath;
-        assertAll(
-                () -> assertThat(fileInfo.getFileUrl()).contains(fileUrl),
-                () -> assertThat(fileInfo.getFilePath()).contains(saveDir),
-                () -> assertThat(fileInfo.getFileOriginName()).isEqualTo(originalName)
-        );
-    }
 }

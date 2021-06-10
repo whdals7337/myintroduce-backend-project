@@ -1,13 +1,15 @@
 package com.myintroduce.utill;
 
-import com.myintroduce.domain.FileInfo;
+import com.myintroduce.error.exception.file.NoSupportedBrowserException;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Enumeration;
 
 public class FileUtil {
 
@@ -27,43 +29,58 @@ public class FileUtil {
         return RandomStringUtils.randomAlphabetic(5)+ "_" + RandomStringUtils.randomNumeric(5) + "_" +
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + extension;
     }
-    
-    // 디렉토리가 없는 경우 생성 메서드
-    public static void createDir(String dirPath) {
-        File file = new File(dirPath);
-        if(!file.exists()) {
-            file.mkdir();
+
+    public static String getFileNameByBrowser(String fileName, HttpServletRequest request)
+            throws UnsupportedEncodingException, NoSupportedBrowserException {
+        String browser= "";
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            if(headerName.equals("user-agent")) {
+                browser = request.getHeader(headerName);
+            }
         }
-    }
-    
-    // 파일이 존재하는 경우 삭제 메서드
-    public static void deleteFile(String filePath) {
-        File file = new File(filePath);
-        if(file.exists()) {
-             file.delete();
+
+        String docName = "";
+        if (browser.contains("Trident") || browser.contains("MSIE") || browser.contains("Edge")) {
+            docName = FileUtil.mappingSpecialCharacter(URLEncoder.encode(fileName, "UTF-8"));
+
+        } else if (browser.contains("Firefox")) {
+            docName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+
+        } else if (browser.contains("Opera")) {
+            docName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+
+        } else if (browser.contains("Chrome")) {
+            docName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+
+        } else if (browser.contains("Safari")) {
+            docName = new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+
+        } else {
+            throw new NoSupportedBrowserException();
         }
+        return docName;
     }
 
-    public static FileInfo getFileInfo(String originalName, String domain,
-                                       String dirType, String fileUploadPath, String subFileUploadPath) {
+    public static String mappingSpecialCharacter(String name) {
 
-        // file parameter setting
-        String saveName = FileUtil.getRandomFileName(originalName);
-        String fileUrl = domain + dirType + subFileUploadPath + saveName;
-        String saveDir = fileUploadPath + subFileUploadPath;
-        String filePath =  saveDir + saveName;
-
-        // file 디렉토리 생성
-        FileUtil.createDir(saveDir);
-
-        return new FileInfo(filePath, originalName, fileUrl);
-    }
-
-    public static void transferFile(MultipartFile file, String filePath) {
+        // 파일명에 사용되는 특수문자
+        char[] sh_list = { '~', '!', '@', '#', '$', '%', '&', '(', ')', '=', ';', '[', ']', '{', '}', '^', '-' };
         try {
-            file.transferTo(new File(filePath));
-        } catch (IOException e) {
+            for (char sh : sh_list) {
+                String encodeStr = URLEncoder.encode(sh + "", "UTF-8");
+                name = name.replaceAll(encodeStr, "\\" + sh);
+            }
+
+            // 띄워쓰기 -> + 치환
+            name = name.replaceAll("%2B", "+");
+            // 콤마 -> _ 치환
+            name = name.replaceAll("%2C", "_");
+
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        return name;
     }
 }

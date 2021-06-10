@@ -8,6 +8,7 @@ import com.myintroduce.domain.network.Header;
 import com.myintroduce.domain.network.Pagination;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
+import com.myintroduce.uploader.Uploader;
 import com.myintroduce.utill.FileUtil;
 import com.myintroduce.web.dto.member.MemberRequestDto;
 import com.myintroduce.web.dto.member.MemberResponseDto;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,39 +39,43 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
     @Value("${file.upload-dir}")
     private String fileUploadPath;
 
-    @Value("${server-domain}")
-    private String domain;
-
-    @Value("${file.images-dir}")
-    private String dirType;
-
     @Value("${file.member-dir}")
     private String subFileUploadPath;
+
+    private final Uploader uploader;
 
     private final SkillService skillService;
 
     private final ProjectService projectService;
 
     @Override
-    public Header<MemberResponseDto> save(MemberRequestDto requestDto, MultipartFile file) {
-        // [1] file parameter setting
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                dirType, fileUploadPath, subFileUploadPath);
+    public Header<MemberResponseDto> save(MemberRequestDto requestDto, MultipartFile file) throws IOException {
+        String fileUrl = "";
+        try {
+            // [1] file upload to S3
+            fileUrl = uploader.upload(file, fileUploadPath + "/" + subFileUploadPath);
+            FileInfo fileInfo = new FileInfo(FileUtil.cutFileName(file.getOriginalFilename(), 100), fileUrl);
 
-        // [2] member info DB 등록
-        Member member = baseRepository.save(requestDto.toEntity(fileInfo, "N"));
-        log.info("member info DB insert" + member);
+            // [2] member info DB 등록
+            Member member = baseRepository.save(requestDto.toEntity(fileInfo, "N"));
+            log.info("member info DB insert" + member);
 
-        // [3] file transfer
-        FileUtil.transferFile(file, fileInfo.getFilePath());
+            return Header.OK(response(member));
 
-        return Header.OK(response(member));
+        } catch (Exception e) {
+            log.debug("s3에 저장되었던 member 파일 삭제");
+            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            throw e;
+        }
     }
 
     @Override
-    public Header update(MemberRequestDto requestDto, Long id, MultipartFile file) {
+    public Header update(MemberRequestDto requestDto, Long id, MultipartFile file) throws IOException {
         Member member = baseRepository.findById(id)
                 .orElseThrow(MemberNotFoundException::new);
+
+        String fileUrl ="";
+        String preExistingFileUrl = member.getFileInfo().getFileUrl();
 
         if (file == null || file.isEmpty()) {
             // [1] member info DB update
@@ -79,20 +85,23 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
             return Header.OK(response(member));
         }
 
-        // [1] file parameter setting
-        FileInfo fileInfo = FileUtil.getFileInfo(file.getOriginalFilename(), domain,
-                dirType, fileUploadPath, subFileUploadPath);
-        String preExistingFilePath = member.getFileInfo().getFilePath();
+        try {
+            // [1] file upload to S3
+            fileUrl = uploader.upload(file, fileUploadPath + "/" + subFileUploadPath);
+            FileInfo fileInfo = new FileInfo(FileUtil.cutFileName(file.getOriginalFilename(), 100), fileUrl);
 
-        // [2] member info DB update
-        member.update(requestDto.toEntity(fileInfo, member.getSelectYN()));
-        log.info("member info DB update" + member);
+            // [2] member info DB update
+            member.update(requestDto.toEntity(fileInfo, member.getSelectYN()));
+            log.info("member info DB update" + member);
 
-        // [3] file transfer
-        FileUtil.transferFile(file, fileInfo.getFilePath());
+        } catch (Exception e) {
+            log.debug("s3에 저장되었던 member 파일 삭제");
+            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            throw e;
+        }
 
-        // [4] pre-existing file delete
-        FileUtil.deleteFile(preExistingFilePath);
+        // [3] pre-existing file delete
+        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
 
         return Header.OK(response(member));
     }
@@ -107,7 +116,8 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
         log.info("member info DB delete" + member);
 
         // [2] pre-existing file delete
-        FileUtil.deleteFile(member.getFileInfo().getFilePath());
+        String preExistingFileUrl = member.getFileInfo().getFileUrl();
+        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
 
         return Header.OK();
     }

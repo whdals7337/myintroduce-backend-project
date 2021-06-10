@@ -5,6 +5,7 @@ import com.myintroduce.domain.network.Header;
 import com.myintroduce.domain.network.Pagination;
 import com.myintroduce.error.exception.member.MemberNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
+import com.myintroduce.uploader.Uploader;
 import com.myintroduce.web.dto.member.MemberRequestDto;
 import com.myintroduce.web.dto.member.MemberResponseDto;
 import com.myintroduce.web.dto.membertotalinfo.MemberTotalInfoResponseDto;
@@ -38,17 +39,17 @@ class MemberServiceTest {
     @Mock
     private MemberRepository memberRepository;
     @Mock
+    private Uploader uploader;
+    @Mock
     private SkillService skillService;
     @Mock
     private ProjectService projectService;
 
     @BeforeEach
     public void setUp() {
-        memberService = new MemberService(skillService, projectService);
+        memberService = new MemberService(uploader, skillService, projectService);
         memberService.baseRepository = memberRepository;
-        ReflectionTestUtils.setField(memberService, "fileUploadPath","/test-dir/files/");
-        ReflectionTestUtils.setField(memberService, "domain", "http://localhost:8080");
-        ReflectionTestUtils.setField(memberService, "dirType", "images");
+        ReflectionTestUtils.setField(memberService, "fileUploadPath","test");
         ReflectionTestUtils.setField(memberService, "subFileUploadPath", "member");
     }
 
@@ -66,7 +67,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateWithFile() {
+    public void updateWithFile() throws IOException {
         given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header target = memberService.update(mockMemberRequestDto(), 1L ,TestUtil.mockFile());
@@ -81,7 +82,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateWithoutFile() {
+    public void updateWithoutFile() throws IOException {
         given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header target = memberService.update(mockMemberRequestDto(), 1L ,null);

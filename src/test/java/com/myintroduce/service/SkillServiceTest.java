@@ -8,6 +8,7 @@ import com.myintroduce.domain.network.Pagination;
 import com.myintroduce.error.exception.skill.SkillNotFoundException;
 import com.myintroduce.repository.member.MemberRepository;
 import com.myintroduce.repository.skill.SkillRepository;
+import com.myintroduce.uploader.Uploader;
 import com.myintroduce.web.dto.skill.SkillRequestDto;
 import com.myintroduce.web.dto.skill.SkillResponseDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,17 +39,17 @@ class SkillServiceTest {
     @InjectMocks
     private SkillService skillService;
     @Mock
+    private Uploader uploader;
+    @Mock
     private MemberRepository memberRepository;
     @Mock
     private SkillRepository skillRepository;
 
     @BeforeEach
     public void setUp() {
-        skillService = new SkillService(memberRepository);
+        skillService = new SkillService(uploader, memberRepository);
         skillService.baseRepository = skillRepository;
-        ReflectionTestUtils.setField(skillService, "fileUploadPath","/test-dir/files/");
-        ReflectionTestUtils.setField(skillService, "domain", "http://localhost:8080");
-        ReflectionTestUtils.setField(skillService, "dirType", "images");
+        ReflectionTestUtils.setField(skillService, "fileUploadPath","test-dir");
         ReflectionTestUtils.setField(skillService, "subFileUploadPath", "skill");
     }
 
@@ -69,7 +70,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void updateWithFile() {
+    public void updateWithFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.findById(1L)).willReturn(Optional.of(mockSkill(member,1L, 3)));
@@ -86,7 +87,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void updateWithoutFile() {
+    public void updateWithoutFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.findById(1L)).willReturn(Optional.of(mockSkill(member,1L, 3)));
@@ -219,7 +220,7 @@ class SkillServiceTest {
         return Skill.builder()
                 .id(id)
                 .skillName("skillName")
-                .fileInfo(new FileInfo("filePath", "fileOriginName", "fileUrl"))
+                .fileInfo(new FileInfo( "fileOriginName", "fileUrl"))
                 .level(level)
                 .skillLevel(3)
                 .member(member)

@@ -154,7 +154,7 @@ class ProjectApiControllerTest {
                     .projectTitle("프로젝트 이름0" + i)
                     .projectContent("프로젝트 내용0" + i)
                     .projectPostScript("프로젝트 추신0" + i)
-                    .fileInfo(new FileInfo("프로젝트 이미지 경로0" + i, "프로젝트 이미지 원본이름0" + i, "파일 주소" ))
+                    .fileInfo(new FileInfo("프로젝트 이미지 원본이름0" + i, "파일 주소" ))
                     .projectLink("http://gergerg" + i)
                     .level(i)
                     .member(member)
@@ -240,7 +240,7 @@ class ProjectApiControllerTest {
                     .projectTitle("프로젝트 이름0" + i)
                     .projectContent("프로젝트 내용0" + i)
                     .projectPostScript("프로젝트 추신0" + i)
-                    .fileInfo(new FileInfo("프로젝트 이미지 경로0" + i, "프로젝트 이미지 원본이름0" + i, "파일 주소" ))
+                    .fileInfo(new FileInfo( "프로젝트 이미지 원본이름0" + i, "파일 주소" ))
                     .projectLink("http://gergerg" + i)
                     .level(i)
                     .member(member)
@@ -295,7 +295,6 @@ class ProjectApiControllerTest {
         assertThat(target.getProjectContent()).isEqualTo(expectedProjectContent);
         assertThat(target.getProjectPostScript()).isEqualTo(expectedProjectPostScript);
         assertThat(target.getFileInfo().getFileOriginName()).isEqualTo(expectedProject.getFileInfo().getFileOriginName());
-        assertThat(target.getFileInfo().getFilePath()).isEqualTo(expectedProject.getFileInfo().getFilePath());
         assertThat(target.getFileInfo().getFileUrl()).isEqualTo(expectedProject.getFileInfo().getFileUrl());
         assertThat(target.getProjectLink()).isEqualTo(expectedProjectLink);
         assertThat(target.getLevel()).isEqualTo(expectedLevel);
@@ -406,7 +405,7 @@ class ProjectApiControllerTest {
     private Member givenMember() {
         return memberRepository.save(Member.builder()
                 .comment("코멘트")
-                .fileInfo(new FileInfo("헤어 이미지 경로", "헤더 이미지 원본 이름", "파일 경로"))
+                .fileInfo(new FileInfo( "헤더 이미지 원본 이름", "파일 경로.com/qwe"))
                 .subIntroduction("서브 자기소개")
                 .introduction("자기소개")
                 .phoneNumber("연락처")
@@ -419,7 +418,7 @@ class ProjectApiControllerTest {
         return projectRepository.save(Project.builder()
                 .projectTitle("프로젝트 이름0")
                 .projectContent("프로젝트 내용0")
-                .fileInfo(new FileInfo("프로젝트 이미지 경로0", "프로젝트 이미지 원본이름0", "파일주소"))
+                .fileInfo(new FileInfo( "프로젝트 이미지 원본이름0", "파일주소.com/qwe"))
                 .projectPostScript("프로젝트 추신0")
                 .projectLink("http://gergerg")
                 .level(1)
