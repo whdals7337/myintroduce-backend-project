@@ -22,16 +22,4 @@ file:
 jwt:
   signature: 12345678901234567890123456789012
 
-cloud:
-  aws:
-    credentials:
-      accessKey: $ACCESS_KEY_ID
-      secretKey: $SECRET_ACCESS_KEY
-    s3:
-      bucket: myintroduce-springboot-build
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false
-
     
