@@ -41,8 +41,6 @@ public class S3Uploader implements Uploader {
 
     @Override
     public Resource downloadResource(String key) {
-        System.out.println("downloadResource");
-        System.out.println(key);
         S3Object object = amazonS3Client.getObject(bucket, key);
         S3ObjectInputStream objectContent = object.getObjectContent();
         return new InputStreamResource(objectContent);

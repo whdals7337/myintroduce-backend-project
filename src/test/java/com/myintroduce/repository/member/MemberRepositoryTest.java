@@ -46,7 +46,6 @@ class MemberRepositoryTest {
         Member expect = givenMember("Y");
         memberRepository.save(expect);
 
-        System.out.println(expect.getSkills());
         Skill skill1 = Skill.builder()
                 .skillName("skillName")
                 .skillLevel(1)
