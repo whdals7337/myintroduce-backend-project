@@ -77,8 +77,9 @@ public class ErrorController {
             builder.append(" 입력된 값: [");
             builder.append(fieldError.getRejectedValue());
             builder.append("]");
+            builder.append("\n");
         }
-        return new ErrorMsg(HttpStatus.INTERNAL_SERVER_ERROR, builder.toString());
+        return new ErrorMsg(HttpStatus.BAD_REQUEST, builder.toString());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
