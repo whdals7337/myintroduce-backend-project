@@ -23,4 +23,6 @@ http://ec2-13-125-104-210.ap-northeast-2.compute.amazonaws.com/swagger-ui.html
 
 2021-06-08 AWS S3 + CloudFront를 이용해서 프론트엔드 서비스 재개 www.wellbell.co.kr
 
+2021-06-30 동적 코드 분석 도구 jacoco(Java Code Coverage) 적용
+
 ![image](https://user-images.githubusercontent.com/55545105/121142595-1ee63980-c877-11eb-8c42-bbddd0c26898.png)
