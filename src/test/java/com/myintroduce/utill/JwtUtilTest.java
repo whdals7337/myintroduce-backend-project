@@ -11,7 +11,7 @@ class JwtUtilTest {
     private JwtUtil jwtUtil = new JwtUtil(key);
 
     @Test
-    public void createToken_test() {
+    void createToken_test() {
         // given
 
         // when
@@ -22,7 +22,7 @@ class JwtUtilTest {
     }
 
     @Test
-    public void getClaims_test() {
+    void getClaims_test() {
         // given
         String token = jwtUtil.createToken(1004L, "testerName");
 
@@ -35,7 +35,7 @@ class JwtUtilTest {
     }
     
     @Test
-    public void isExpired_test() {
+    void isExpired_test() {
         // given
         String token = jwtUtil.createToken(1004L, "testerName");
 

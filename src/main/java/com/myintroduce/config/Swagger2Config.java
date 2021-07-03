@@ -38,7 +38,7 @@ public class Swagger2Config {
         return new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
                 .alternateTypeRules(AlternateTypeRules
-                        .newRule(typeResolver.resolve(Pageable.class), typeResolver.resolve(Page.class)))
+                        .newRule(typeResolver.resolve(Pageable.class), typeResolver.resolve(PageInfo.class)))
                 .apiInfo(apiInfo())
                 .securityContexts(Collections.singletonList(securityContext()))
                 .securitySchemes(Collections.singletonList(apiKey()))
@@ -76,7 +76,7 @@ public class Swagger2Config {
 
     @Getter @Setter
     @ApiModel
-    static class Page {
+    static class PageInfo {
         @ApiModelProperty(value = "페이지 번호(0..N)")
         private Integer page;
 

@@ -2,11 +2,12 @@ package com.myintroduce.domain.entity.user;
 
 import lombok.*;
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

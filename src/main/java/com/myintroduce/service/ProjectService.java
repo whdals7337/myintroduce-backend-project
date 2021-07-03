@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProjectService extends BaseWithFileService<ProjectRequestDto, ProjectResponseDto, ProjectRepository> {
 
+    private static final String SUFFIX = ".com/";
+
     @Value("${file.upload-dir}")
     private String fileUploadPath;
 
@@ -62,13 +64,13 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
 
         } catch (Exception e) {
             log.debug("s3에 저장되었던 project 파일 삭제");
-            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            uploader.delete(removeSuffixUrl(fileUrl));
             throw e;
         }
     }
 
     @Override
-    public Header update(ProjectRequestDto requestDto, Long id, MultipartFile file) throws IOException {
+    public Header<ProjectResponseDto> update(ProjectRequestDto requestDto, Long id, MultipartFile file) throws IOException {
         Project project = baseRepository.findById(id)
                 .orElseThrow(ProjectNotFoundException::new);
 
@@ -101,18 +103,18 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
 
         } catch (Exception e) {
             log.debug("s3에 저장되었던 project 파일 삭제");
-            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            uploader.delete(removeSuffixUrl(fileUrl));
             throw e;
         }
 
         // [5] pre-existing file delete
-        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
+        uploader.delete(removeSuffixUrl(preExistingFileUrl));
 
         return Header.OK(response(project));
     }
 
     @Override
-    public Header delete(Long id) {
+    public Header<ProjectResponseDto> delete(Long id) {
         Project project = baseRepository.findById(id)
                 .orElseThrow(ProjectNotFoundException::new);
 
@@ -122,7 +124,7 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
 
         // [2] pre-existing file delete
         String preExistingFileUrl = project.getFileInfo().getFileUrl();
-        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
+        uploader.delete(removeSuffixUrl(preExistingFileUrl));
 
         return Header.OK();
     }
@@ -153,6 +155,10 @@ public class ProjectService extends BaseWithFileService<ProjectRequestDto, Proje
                 .build();
 
         return Header.OK(projectResponseDtoList, pagination);
+    }
+
+    private String removeSuffixUrl(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf(SUFFIX) + SUFFIX.length());
     }
 
     public ProjectResponseDto response(Project project) {

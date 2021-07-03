@@ -74,7 +74,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void save_member() throws Exception {
+    void save_member() throws Exception {
         // given
         MockMultipartFile testFile
                 = new MockMultipartFile(
@@ -121,7 +121,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void save_member_with_out_file() throws Exception {
+    void save_member_with_out_file() throws Exception {
         String comment = "코멘트 영역 입니다.";
         String sub_introduction = "서브 자기소개 영역입니다.";
         String introduction = "자기소개 영역입니다.";
@@ -144,7 +144,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void update_member() throws Exception {
+    void update_member() throws Exception {
         Long updateId = givenMember("N").getId();
         String expectedComment = "comment";
         String expectedSubIntroduction = "subIntroduction";
@@ -186,7 +186,7 @@ class MemberApiControllerTest {
                 .andExpect(jsonPath("$.data.phone_number").value(expectedPhoneNumber))
                 .andExpect(jsonPath("$.data.email").value(expectedEmail));
 
-        assertThat(updateId).isGreaterThan(0L);
+        assertThat(updateId).isPositive();
         Member target = memberRepository.findById(updateId).get();
         assertThat(target.getComment()).isEqualTo(expectedComment);
         assertThat(target.getFileInfo().getFileOriginName()).isEqualTo(testFile.getOriginalFilename());
@@ -197,7 +197,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void update_member_without_file() throws Exception {
+    void update_member_without_file() throws Exception {
         Member member = givenMember("N");
         Long updateId = member.getId();
 
@@ -233,7 +233,7 @@ class MemberApiControllerTest {
                 .andExpect(jsonPath("$.data.phone_number").value(expectedPhoneNumber))
                 .andExpect(jsonPath("$.data.email").value(expectedEmail));
 
-        assertThat(updateId).isGreaterThan(0L);
+        assertThat(updateId).isPositive();
         Member target = memberRepository.findById(updateId).get();
         assertThat(target.getComment()).isEqualTo(expectedComment);
         assertThat(target.getFileInfo().getFileOriginName()).isEqualTo(member.getFileInfo().getFileOriginName());
@@ -245,7 +245,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void update_member_with_wrong_id() throws Exception {
+    void update_member_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/member/" + 404;
 
         MockMultipartHttpServletRequestBuilder builder =
@@ -263,7 +263,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void delete_member() throws Exception {
+    void delete_member() throws Exception {
         Member member = givenMember("N");
 
         String url = "http://localhost:" + port + "/api/member/" + member.getId();
@@ -277,7 +277,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void delete_member_with_wrong_id() throws Exception {
+    void delete_member_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/member/" + 404;
 
         mockMvc.perform(delete(url)
@@ -288,7 +288,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void find_member() throws Exception {
+    void find_member() throws Exception {
         Member member = givenMember("N");
 
         String url = "http://localhost:" + port + "/api/member/" + member.getId();
@@ -306,7 +306,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void find_member_with_wrong_id() throws Exception {
+    void find_member_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/member/" + 404;
 
         mockMvc.perform(get(url))
@@ -316,7 +316,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void totalInfo() throws Exception {
+    void totalInfo() throws Exception {
         Member member = givenMember("N");
         Project project = givenProject(member);
         Skill skill = givenSkill(member);
@@ -354,7 +354,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void totalInfo_with_wrong_id() throws Exception {
+    void totalInfo_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/member/"+ 404 +"/totalInfo";
 
         mockMvc.perform(get(url))
@@ -364,7 +364,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void member_select() throws Exception {
+    void member_select() throws Exception {
         Member member = givenMember("N");
         String url = "http://localhost:" + port + "/api/member/select/"+member.getId();
 
@@ -392,7 +392,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void find_all_member() throws Exception {
+    void find_all_member() throws Exception {
         int size = 6;
         for(int i = 0; i < size; i++){
             givenMember();
@@ -410,7 +410,7 @@ class MemberApiControllerTest {
 
 
     @Test
-    public void findBySelectYN() throws Exception {
+    void findBySelectYN() throws Exception {
         Member member = givenMember("Y");
 
         String url = "http://localhost:" + port + "/api/member/select";
@@ -428,7 +428,7 @@ class MemberApiControllerTest {
     }
 
     @Test
-    public void member_select_with_wrong_id() throws Exception {
+    void member_select_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/member/select/"+ 400;
         mockMvc.perform(patch(url)
                 .header("Authorization", "Bearer "+token))

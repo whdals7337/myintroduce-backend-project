@@ -18,13 +18,10 @@ import java.time.Duration;
 public class CacheConfig {
 
     @Autowired
-    RedisConnectionFactory redisConnectionFactory;
-
-    @Autowired
     ObjectMapper objectMapper;
 
     @Bean
-    public CacheManager redisCacheManger() {
+    public CacheManager redisCacheManger(RedisConnectionFactory redisConnectionFactory) {
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(RedisSerializationContext.SerializationPair
                         .fromSerializer(new StringRedisSerializer()))
@@ -32,9 +29,7 @@ public class CacheConfig {
                         .fromSerializer(new GenericJackson2JsonRedisSerializer()))
                 .entryTtl(Duration.ofSeconds(30));
 
-        RedisCacheManager redisCacheManager = RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory)
+        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration).build();
-
-        return redisCacheManager;
     }
 }

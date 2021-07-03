@@ -24,7 +24,7 @@ class SkillRepositoryTest {
     private MemberRepository memberRepository;
 
     @Test
-    public void findAllByMember_test() {
+    void findAllByMember_test() {
         // given
         Member member = givenMember();
         for(int i = 1; i < 6; i++) {
@@ -37,7 +37,7 @@ class SkillRepositoryTest {
         // then
         assertThat(list.getTotalPages()).isEqualTo(3);
         assertThat(list.getTotalElements()).isEqualTo(5);
-        assertThat(list.getNumber()).isEqualTo(0);
+        assertThat(list.getNumber()).isZero();
         assertThat(list.getNumberOfElements()).isEqualTo(2);
         for(Skill skill : list) {
             assertThat(skill.getMember()).isEqualTo(member);

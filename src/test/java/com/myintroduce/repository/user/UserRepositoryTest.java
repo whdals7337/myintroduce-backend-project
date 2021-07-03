@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -19,7 +17,7 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    public void findByUsername_test() throws Exception {
+    void findByUsername_test() {
         // given
         User user = User.builder()
                 .username("tester")
@@ -29,11 +27,11 @@ class UserRepositoryTest {
         userRepository.save(user);
 
         // when
-        Optional<User> findUser = userRepository.findByUsername("tester");
+        User findUser = userRepository.findByUsername("tester").orElse(null);
 
         // then
-        assertThat(findUser.isPresent()).isTrue();
-        assertThat(findUser.get()).isEqualTo(user);
-        assertThat(findUser.get().getId()).isNotNull();
+        assert findUser != null;
+        assertThat(findUser).isEqualTo(user);
+        assertThat(findUser.getId()).isNotNull();
     }
 }

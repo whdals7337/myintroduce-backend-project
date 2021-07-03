@@ -23,10 +23,6 @@ import java.io.UnsupportedEncodingException;
 @RestControllerAdvice
 public class ErrorController {
 
-    private static String getSimpleName(Exception e) {
-        return e.getClass().getSimpleName();
-    }
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = MemberNotFoundException.class)
     public ErrorMsg handleMemberNotFoundException(MemberNotFoundException e) {

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class FileUtilTest {
 
     @Test
-    public void cutFileName_test() {
+    void cutFileName_test() {
         // given
         String fileName = "파일이름.txt";
         int length = 10;
@@ -25,7 +25,7 @@ class FileUtilTest {
     }
 
     @Test
-    public void cutFileName_over_test() {
+    void cutFileName_over_test() {
         // given
         String fileName = "파일이름.txt";
         int length = 5;
@@ -38,7 +38,7 @@ class FileUtilTest {
     }
     
     @Test
-    public void getRandomFileName_test() throws Exception {
+    void getRandomFileName_test() throws Exception {
         // given
         String fileName = "파일이름.txt";
 
@@ -49,8 +49,8 @@ class FileUtilTest {
         String[] split = randomFileName.split("_");
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         assertAll(
-                () -> assertThat(split[0].matches("^[a-zA-Z]{5}$")).isEqualTo(true),
-                () -> assertThat(split[1].matches("^[0-9]{5}$")).isEqualTo(true),
+                () -> assertThat(split[0]).matches("^[a-zA-Z]{5}$"),
+                () -> assertThat(split[1]).matches("^[0-9]{5}$"),
                 () -> assertThat(split[2]).isEqualTo(now+".txt")
         );
     }

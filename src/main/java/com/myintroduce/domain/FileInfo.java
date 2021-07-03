@@ -18,7 +18,7 @@ public class FileInfo {
     @Column(length = 500, nullable = false)
     private String fileUrl;
 
-    public String S3key() {
+    public String s3key() {
         return fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5);
     }
 }

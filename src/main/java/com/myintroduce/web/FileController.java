@@ -40,23 +40,23 @@ public class FileController {
     public ResponseEntity<Resource> fileDownload(@PathVariable String type,
                                                  @PathVariable("id") Long id,
                                                  HttpServletRequest request) throws IOException {
-        String S3key = null;
+        String s3key = null;
         String filename = null;
 
         switch (type) {
             case "member" :
                 Member member = memberRepository.findById(id).orElseThrow(MemberNotFoundException::new);
-                S3key =  member.getFileInfo().S3key();
+                s3key =  member.getFileInfo().s3key();
                 filename =  member.getFileInfo().getFileOriginName();
                 break;
             case "project" :
                 Project project = projectRepository.findById(id).orElseThrow(ProjectNotFoundException::new);
-                S3key = project.getFileInfo().S3key();
+                s3key = project.getFileInfo().s3key();
                 filename = project.getFileInfo().getFileOriginName();
                 break;
             case "skill" :
                 Skill skill = skillRepository.findById(id).orElseThrow(SkillNotFoundException::new);
-                S3key = skill.getFileInfo().S3key();
+                s3key = skill.getFileInfo().s3key();
                 filename = skill.getFileInfo().getFileOriginName();
                 break;
             default:
@@ -64,7 +64,7 @@ public class FileController {
         }
 
         filename = FileUtil.getFileNameByBrowser(filename, request);
-        Resource resource = uploader.downloadResource(S3key);
+        Resource resource = uploader.downloadResource(s3key);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")

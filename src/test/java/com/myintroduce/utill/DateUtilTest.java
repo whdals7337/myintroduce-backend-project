@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DateUtilTest {
 
     @Test
-    public void getTodayByCustomFormat_test() {
+    void getTodayByCustomFormat_test() {
         // given
 
         // when

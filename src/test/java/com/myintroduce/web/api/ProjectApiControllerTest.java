@@ -71,7 +71,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void save_project() throws Exception {
+    void save_project() throws Exception {
         MockMultipartFile testFile
                 = new MockMultipartFile(
                 "file",
@@ -118,7 +118,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void save_project_without_file() throws Exception {
+    void save_project_without_file() throws Exception {
         String projectTitle = "프로젝트 이름";
         String projectContent = "프로젝트 내용";
         String projectPostScript = "프로젝트 추신";
@@ -142,7 +142,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void update_project() throws Exception{
+    void update_project() throws Exception{
         Long updateId = null;
         // level 의 3과 1을 교환한 순서
         int[] level_list = {2, 3, 1 ,4};
@@ -209,7 +209,7 @@ class ProjectApiControllerTest {
                 .andExpect(jsonPath("$.data.member_id").value(expectedMemberId));
 
         assert updateId != null;
-        assertThat(updateId).isGreaterThan(0L);
+        assertThat(updateId).isPositive();
         Project target = projectRepository.findById(updateId).get();
         assertThat(target.getProjectTitle()).isEqualTo(expectedProjectTitle);
         assertThat(target.getProjectContent()).isEqualTo(expectedProjectContent);
@@ -227,7 +227,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void update_project_without_file() throws Exception{
+    void update_project_without_file() throws Exception{
         Long updateId = null;
         // level 의 3과 1을 교환한 순서
         int[] level_list = {2, 3, 1 ,4};
@@ -289,7 +289,7 @@ class ProjectApiControllerTest {
                 .andExpect(jsonPath("$.data.member_id").value(expectedMemberId));
 
         assert updateId != null;
-        assertThat(updateId).isGreaterThan(0L);
+        assertThat(updateId).isPositive();
         Project target = projectRepository.findById(updateId).get();
         assertThat(target.getProjectTitle()).isEqualTo(expectedProjectTitle);
         assertThat(target.getProjectContent()).isEqualTo(expectedProjectContent);
@@ -308,7 +308,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void update_project_with_wrong_id() throws Exception{
+    void update_project_with_wrong_id() throws Exception{
         String url = "http://localhost:" + port + "/api/project/" + 404;
 
         MockMultipartHttpServletRequestBuilder builder =
@@ -326,7 +326,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void delete_project() throws Exception {
+    void delete_project() throws Exception {
         Member member = givenMember();
         Project project = givenProject(member);
 
@@ -341,7 +341,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void delete_project_with_wrong_id() throws Exception {
+    void delete_project_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/project/" + 404;
 
         mockMvc.perform(delete(url)
@@ -352,7 +352,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void find_project() throws Exception {
+    void find_project() throws Exception {
         Member member = givenMember();
         Project project = givenProject(member);
 
@@ -372,7 +372,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void find_project_with_wrong_id() throws Exception {
+    void find_project_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/project/" + 404;
 
         mockMvc.perform(get(url))
@@ -382,7 +382,7 @@ class ProjectApiControllerTest {
     }
 
     @Test
-    public void find_all_project() throws Exception {
+    void find_all_project() throws Exception {
         Member member = givenMember();
         int size = 6;
         for(int i = 0; i < size; i++){

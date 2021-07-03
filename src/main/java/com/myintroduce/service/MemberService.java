@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class MemberService extends BaseWithFileService<MemberRequestDto, MemberResponseDto, MemberRepository> {
 
+    private static final String SUFFIX = ".com/";
+
     @Value("${file.upload-dir}")
     private String fileUploadPath;
 
@@ -64,13 +66,13 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
         } catch (Exception e) {
             log.debug("s3에 저장되었던 member 파일 삭제");
-            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            uploader.delete(removeSuffixUrl(fileUrl));
             throw e;
         }
     }
 
     @Override
-    public Header update(MemberRequestDto requestDto, Long id, MultipartFile file) throws IOException {
+    public Header<MemberResponseDto> update(MemberRequestDto requestDto, Long id, MultipartFile file) throws IOException {
         Member member = baseRepository.findById(id)
                 .orElseThrow(MemberNotFoundException::new);
 
@@ -96,18 +98,18 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
         } catch (Exception e) {
             log.debug("s3에 저장되었던 member 파일 삭제");
-            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            uploader.delete(removeSuffixUrl(fileUrl));
             throw e;
         }
 
         // [3] pre-existing file delete
-        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
+        uploader.delete(removeSuffixUrl(preExistingFileUrl));
 
         return Header.OK(response(member));
     }
 
     @Override
-    public Header delete(Long id) {
+    public Header<MemberResponseDto> delete(Long id) {
         Member member = baseRepository.findById(id)
                 .orElseThrow(MemberNotFoundException::new);
 
@@ -117,7 +119,7 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
 
         // [2] pre-existing file delete
         String preExistingFileUrl = member.getFileInfo().getFileUrl();
-        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
+        uploader.delete(removeSuffixUrl(preExistingFileUrl));
 
         return Header.OK();
     }
@@ -203,6 +205,10 @@ public class MemberService extends BaseWithFileService<MemberRequestDto, MemberR
         member.select();
 
         return Header.OK(response(member));
+    }
+
+    private String removeSuffixUrl(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf(SUFFIX) + SUFFIX.length());
     }
 
     private MemberResponseDto response(Member member) {

@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ class ProjectServiceTest {
     private ProjectRepository projectRepository;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         projectService = new ProjectService(uploader, memberRepository);
         projectService.baseRepository = projectRepository;
         ReflectionTestUtils.setField(projectService, "fileUploadPath","test");
@@ -54,7 +55,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void saveWithFile() throws IOException {
+    void saveWithFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(projectRepository.save(any(Project.class))).willReturn(mockProject(member, 1L, 1));
@@ -70,7 +71,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void updateWithFile() throws IOException {
+    void updateWithFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(projectRepository.findById(1L)).willReturn(Optional.of(mockProject(member, 1L, 1)));
@@ -87,7 +88,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void updateWithoutFile() throws IOException {
+    void updateWithoutFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(projectRepository.findById(1L)).willReturn(Optional.of(mockProject(member, 1L, 1)));
@@ -103,7 +104,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void updateDiffLevel() throws IOException {
+    void updateDiffLevel() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
         List<Project> list = new ArrayList<>();
         list.add(mockProject(member, 2L, 2));
@@ -129,16 +130,18 @@ class ProjectServiceTest {
 
 
     @Test
-    public void updateNotFoundProject() {
+    void updateNotFoundProject() {
+        ProjectRequestDto projectRequestDto = mockProjectRequestDto(1L, 1);
+        MockMultipartFile mockMultipartFile = TestUtil.mockFile();
         given(projectRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(ProjectNotFoundException.class)
-                .isThrownBy(() -> projectService.update(mockProjectRequestDto(1L, 1), 1L, TestUtil.mockFile()))
+                .isThrownBy(() -> projectService.update(projectRequestDto, 1L, mockMultipartFile))
                 .withMessage("Project Entity가 존재하지 않습니다.");
     }
 
     @Test
-    public void delete() {
+    void delete() {
         given(projectRepository.findById(1L))
                 .willReturn(Optional.of(mockProject(TestUtil.mockMember(1L, "N"),1L, 3)));
         Header target = projectService.delete(1L);
@@ -146,7 +149,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void deleteNotFoundProject() {
+    void deleteNotFoundProject() {
         given(projectRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(ProjectNotFoundException.class)
@@ -155,7 +158,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void findById() {
+    void findById() {
         Member member = TestUtil.mockMember(1L, "N");
         given(projectRepository.findById(1L)).willReturn(Optional.of(mockProject(member, 1L, 1)));
         Header<ProjectResponseDto> target = projectService.findById(1L);
@@ -168,7 +171,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void findByIdNotFoundProject () {
+    void findByIdNotFoundProject () {
         given(projectRepository.findById(1L)).willReturn(Optional.empty());
         assertThatExceptionOfType(ProjectNotFoundException.class)
                 .isThrownBy(() -> projectService.findById(1L))
@@ -176,7 +179,7 @@ class ProjectServiceTest {
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         Member member = TestUtil.mockMember(1L, "N");
         List<Project> list = new ArrayList<>();
         list.add(mockProject(member, 1L, 1));
@@ -201,7 +204,7 @@ class ProjectServiceTest {
         assertAll("pagination",
                 () -> assertThat(pagination.getTotalPages()).isEqualTo(1),
                 () -> assertThat(pagination.getTotalElements()).isEqualTo(4),
-                () -> assertThat(pagination.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(pagination.getCurrentPage()).isZero(),
                 () -> assertThat(pagination.getCurrentElements()).isEqualTo(4)
         );
     }

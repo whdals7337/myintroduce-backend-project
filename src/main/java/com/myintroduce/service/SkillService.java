@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResponseDto, SkillRepository> {
 
+    private static final String SUFFIX = ".com/";
+
     @Value("${file.upload-dir}")
     private String fileUploadPath;
 
@@ -62,13 +64,13 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
 
         } catch (Exception e) {
             log.debug("s3에 저장되었던 skill 파일 삭제");
-            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            uploader.delete(removeSuffixUrl(fileUrl));
             throw e;
         }
     }
 
     @Override
-    public Header update(SkillRequestDto requestDto, Long id, MultipartFile file) throws IOException {
+    public Header<SkillResponseDto> update(SkillRequestDto requestDto, Long id, MultipartFile file) throws IOException {
         Skill skill = baseRepository.findById(id)
                 .orElseThrow(SkillNotFoundException::new);
 
@@ -100,18 +102,18 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
 
         } catch (Exception e) {
             log.debug("s3에 저장되었던 project 파일 삭제");
-            uploader.delete(fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5));
+            uploader.delete(removeSuffixUrl(fileUrl));
             throw e;
         }
 
         // [5] pre-existing file delete
-        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
+        uploader.delete(removeSuffixUrl(preExistingFileUrl));
 
         return Header.OK(response(skill));
     }
 
     @Override
-    public Header delete(Long id) {
+    public Header<SkillResponseDto> delete(Long id) {
         Skill skill = baseRepository.findById(id)
                 .orElseThrow(SkillNotFoundException::new);
 
@@ -121,7 +123,7 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
 
         // [2] pre-existing file delete
         String preExistingFileUrl = skill.getFileInfo().getFileUrl();
-        uploader.delete(preExistingFileUrl.substring(preExistingFileUrl.lastIndexOf(".com/") + 5));
+        uploader.delete(removeSuffixUrl(preExistingFileUrl));
 
         return Header.OK();
     }
@@ -151,6 +153,10 @@ public class SkillService extends BaseWithFileService<SkillRequestDto, SkillResp
                 .build();
 
         return Header.OK(skillResponseDtoList, pagination);
+    }
+
+    private String removeSuffixUrl(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf(SUFFIX) + SUFFIX.length());
     }
 
     public SkillResponseDto response(Skill skill) {

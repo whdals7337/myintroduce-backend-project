@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void saveWithFile() throws IOException {
+    void saveWithFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.save(any(Skill.class))).willReturn(mockSkill(member, 1L, 1));
@@ -70,7 +71,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void updateWithFile() throws IOException {
+    void updateWithFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.findById(1L)).willReturn(Optional.of(mockSkill(member,1L, 3)));
@@ -87,7 +88,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void updateWithoutFile() throws IOException {
+    void updateWithoutFile() throws IOException {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.findById(1L)).willReturn(Optional.of(mockSkill(member,1L, 3)));
@@ -103,16 +104,18 @@ class SkillServiceTest {
     }
 
     @Test
-    public void updateNotFoundSkill() {
+    void updateNotFoundSkill() {
+        SkillRequestDto skillRequestDto = mockSkillRequestDto(1L, 1);
+        MockMultipartFile mockMultipartFile = TestUtil.mockFile();
         given(skillRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(SkillNotFoundException.class)
-                .isThrownBy(() -> skillService.update(mockSkillRequestDto(1L, 1), 1L, TestUtil.mockFile()))
+                .isThrownBy(() -> skillService.update(skillRequestDto, 1L, mockMultipartFile))
                 .withMessage("Skill Entity가 존재하지 않습니다.");
     }
 
     @Test
-    public void delete() {
+    void delete() {
         given(skillRepository.findById(1L))
                 .willReturn(Optional.of(mockSkill(TestUtil.mockMember(1L, "N"),1L, 3)));
 
@@ -122,7 +125,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void deleteNotFoundSkill() {
+    void deleteNotFoundSkill() {
         given(skillRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(SkillNotFoundException.class)
@@ -131,7 +134,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void findById() {
+    void findById() {
         Member member = TestUtil.mockMember(1L, "N");
 
         given(skillRepository.findById(1L)).willReturn(Optional.of(mockSkill(member, 1L, 1)));
@@ -146,7 +149,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void findByIdNotFoundSkill () {
+    void findByIdNotFoundSkill () {
         given(skillRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(SkillNotFoundException.class)
@@ -155,7 +158,7 @@ class SkillServiceTest {
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         Member member = TestUtil.mockMember(1L, "N");
         List<Skill> list = new ArrayList<>();
         list.add(mockSkill(member, 1L, 1));
@@ -180,7 +183,7 @@ class SkillServiceTest {
         assertAll("pagination",
                 () -> assertThat(pagination.getTotalPages()).isEqualTo(1),
                 () -> assertThat(pagination.getTotalElements()).isEqualTo(4),
-                () -> assertThat(pagination.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(pagination.getCurrentPage()).isZero(),
                 () -> assertThat(pagination.getCurrentElements()).isEqualTo(4)
         );
     }

@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ProfileControllerUnitTest {
 
     @Test
-    public void real_profile이_조회된다() {
+    void real_profile이_조회된다() {
         //given
         String expectedProfile = "real";
         MockEnvironment env = new MockEnvironment();
@@ -26,7 +26,7 @@ class ProfileControllerUnitTest {
     }
 
     @Test
-    public void real_profile이_없으면_첫번째가_조회된다() {
+    void real_profile이_없으면_첫번째가_조회된다() {
         //given
         String expectedProfile = "oauth";
         MockEnvironment env = new MockEnvironment();
@@ -44,7 +44,7 @@ class ProfileControllerUnitTest {
     }
 
     @Test
-    public void active_profile이_없으면_default가_조회된다() {
+    void active_profile이_없으면_default가_조회된다() {
         //given
         String expectedProfile = "default";
         MockEnvironment env = new MockEnvironment();

@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Header<T> {
 
+    private static final String SUCCESS_CODE = "200";
+    private static final String SUCCESS_MESSAGE = "success";
+
     @ApiModelProperty(position = 1, notes = "상태코드")
     private String status;
     @ApiModelProperty(position = 2, notes = "상태 메세지")
@@ -25,23 +28,24 @@ public class Header<T> {
 
     public static <T> Header<T> OK() {
         return (Header<T>) Header.builder()
-                .status("200")
-                .msg("success")
+                .status(SUCCESS_CODE)
+                .msg(SUCCESS_MESSAGE)
+                .data(null)
                 .build();
     }
 
     public static <T> Header<T> OK(T data) {
         return (Header<T>) Header.builder()
-                .status("200")
-                .msg("success")
+                .status(SUCCESS_CODE)
+                .msg(SUCCESS_MESSAGE)
                 .data(data)
                 .build();
     }
 
     public static <T> Header<T> OK(T data, Pagination pagination) {
         return (Header<T>) Header.builder()
-                .status("200")
-                .msg("success")
+                .status(SUCCESS_CODE)
+                .msg(SUCCESS_MESSAGE)
                 .data(data)
                 .pagination(pagination)
                 .build();

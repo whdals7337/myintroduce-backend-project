@@ -24,7 +24,7 @@ class MemberRepositoryTest {
     private SkillRepository skillRepository;
 
     @Test
-    public void findBySelectYN_test() {
+    void findBySelectYN_test() {
         // given
         Member expect01 = givenMember("Y");
         Member expect02 = givenMember("N");
@@ -35,13 +35,14 @@ class MemberRepositoryTest {
 
         // when
         Optional<Member> findMember = memberRepository.findBySelectYN("Y");
+        Member member = findMember.orElse(null);
 
         //then
-        assertThat(findMember.get()).isEqualTo(expect01);
+        assertThat(member).isEqualTo(expect01);
     }
 
     @Test
-    public void findMemberWithSkills_test() {
+    void findMemberWithSkills_test() {
         // given
         Member expect = givenMember("Y");
         memberRepository.save(expect);

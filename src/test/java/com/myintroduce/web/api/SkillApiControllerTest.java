@@ -71,7 +71,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void save_skill() throws Exception {
+    void save_skill() throws Exception {
         MockMultipartFile testFile
                 = new MockMultipartFile(
                 "file",
@@ -110,7 +110,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void save_skill_without_file() throws Exception {
+    void save_skill_without_file() throws Exception {
         String skillName = "스킬이름";
         int skillLevel = 3;
         Integer level = 1;
@@ -130,7 +130,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void update_skill() throws Exception{
+    void update_skill() throws Exception{
         Long updateId = null;
         Member member = givenMember();
 
@@ -188,7 +188,7 @@ class SkillApiControllerTest {
 
         // 수정된 값 검증
         assert updateId != null;
-        assertThat(updateId).isGreaterThan(0L);
+        assertThat(updateId).isPositive();
         Skill target = skillRepository.findById(updateId).get();
         assertThat(target.getSkillName()).isEqualTo(expectedSkillName);
         assertThat(target.getFileInfo().getFileOriginName()).isEqualTo(testFile.getOriginalFilename());
@@ -198,7 +198,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void update_skill_without_file() throws Exception{
+    void update_skill_without_file() throws Exception{
         Long updateId = null;
         Member member = givenMember();
         Skill expectedSkill = null;
@@ -251,7 +251,7 @@ class SkillApiControllerTest {
 
         // 수정된 값 검증
         assert updateId != null;
-        assertThat(updateId).isGreaterThan(0L);
+        assertThat(updateId).isPositive();
         Skill target = skillRepository.findById(updateId).get();
         assertThat(target.getSkillName()).isEqualTo(expectedSkillName);
         assertThat(target.getFileInfo().getFileOriginName()).isEqualTo(expectedSkill.getFileInfo().getFileOriginName());
@@ -262,7 +262,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void update_skill_with_wrong_id() throws Exception{
+    void update_skill_with_wrong_id() throws Exception{
         String url = "http://localhost:" + port + "/api/skill/" + 404;
 
         MockMultipartHttpServletRequestBuilder builder =
@@ -280,7 +280,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void delete_skill() throws Exception {
+    void delete_skill() throws Exception {
         Member member = givenMember();
         Skill skill = givenSkill(member);
 
@@ -295,7 +295,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void delete_skill_with_wrong_id() throws Exception {
+    void delete_skill_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/skill/" + 404;
 
         mockMvc.perform(delete(url)
@@ -306,7 +306,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void find_skill() throws Exception {
+    void find_skill() throws Exception {
         Member member = givenMember();
         Skill skill = givenSkill(member);
 
@@ -325,7 +325,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void find_skill_with_wrong_id() throws Exception {
+    void find_skill_with_wrong_id() throws Exception {
         String url = "http://localhost:" + port + "/api/skill/" + 404;
 
         mockMvc.perform(get(url))
@@ -335,7 +335,7 @@ class SkillApiControllerTest {
     }
 
     @Test
-    public void find_all_project() throws Exception {
+    void find_all_project() throws Exception {
         Member member = givenMember();
         int size = 6;
         for(int i = 0; i < size; i++){

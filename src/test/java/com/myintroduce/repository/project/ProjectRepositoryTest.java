@@ -26,7 +26,7 @@ class ProjectRepositoryTest {
     private MemberRepository memberRepository;
 
     @Test
-    public void findByLevelBetween_test() {
+    void findByLevelBetween_test() {
         // given
         Member member = givenMember();
         for(int i = 1; i < 6; i++) {
@@ -45,7 +45,7 @@ class ProjectRepositoryTest {
     }
 
     @Test
-    public void findAllByMember_test() {
+    void findAllByMember_test() {
         // given
         Member member = givenMember();
         for(int i = 1; i < 6; i++) {
@@ -58,7 +58,7 @@ class ProjectRepositoryTest {
         // then
         assertThat(list.getTotalPages()).isEqualTo(3);
         assertThat(list.getTotalElements()).isEqualTo(5);
-        assertThat(list.getNumber()).isEqualTo(0);
+        assertThat(list.getNumber()).isZero();
         assertThat(list.getNumberOfElements()).isEqualTo(2);
         for(Project project : list) {
             assertThat(project.getMember()).isEqualTo(member);

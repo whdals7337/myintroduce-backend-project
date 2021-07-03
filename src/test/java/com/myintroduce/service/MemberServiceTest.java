@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void saveWithFile() throws IOException {
+    void saveWithFile() throws IOException {
         given(memberRepository.save(any(Member.class))).willReturn(TestUtil.mockMember(1L, "N"));
 
         Header<MemberResponseDto> target = memberService.save(mockMemberRequestDto(), TestUtil.mockFile());
@@ -67,7 +68,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateWithFile() throws IOException {
+    void updateWithFile() throws IOException {
         given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header target = memberService.update(mockMemberRequestDto(), 1L ,TestUtil.mockFile());
@@ -82,7 +83,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateWithoutFile() throws IOException {
+    void updateWithoutFile() throws IOException {
         given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header target = memberService.update(mockMemberRequestDto(), 1L ,null);
@@ -95,16 +96,18 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateNotFoundMember() {
+    void updateNotFoundMember() {
+        MemberRequestDto memberRequestDto = mockMemberRequestDto();
+        MockMultipartFile mockMultipartFile = TestUtil.mockFile();
         given(memberRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(MemberNotFoundException.class)
-                .isThrownBy(() -> memberService.update(mockMemberRequestDto(), 1L, TestUtil.mockFile()))
+                .isThrownBy(() -> memberService.update(memberRequestDto, 1L, mockMultipartFile))
                 .withMessage("Member Entity가 존재하지 않습니다.");
     }
 
     @Test
-    public void delete() {
+    void delete() {
         given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header target = memberService.delete(1L);
@@ -113,7 +116,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void deleteNotFoundMember() {
+    void deleteNotFoundMember() {
         given(memberRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(MemberNotFoundException.class)
@@ -122,7 +125,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void findById() {
+    void findById() {
         given(memberRepository.findById(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header<MemberResponseDto> target = memberService.findById(1L);
@@ -135,7 +138,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void findByIdNotFoundMember () {
+    void findByIdNotFoundMember () {
         given(memberRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(MemberNotFoundException.class)
@@ -144,7 +147,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void findAll() {
+    void findAll() {
         List<Member> list = new ArrayList<>();
         list.add(TestUtil.mockMember(1L, "Y"));
         list.add(TestUtil.mockMember(2L, "N"));
@@ -170,13 +173,13 @@ class MemberServiceTest {
         assertAll("pagination",
             () -> assertThat(pagination.getTotalPages()).isEqualTo(1),
             () -> assertThat(pagination.getTotalElements()).isEqualTo(4),
-            () -> assertThat(pagination.getCurrentPage()).isEqualTo(0),
+            () -> assertThat(pagination.getCurrentPage()).isZero(),
             () -> assertThat(pagination.getCurrentElements()).isEqualTo(4)
         );
     }
 
     @Test
-    public void findBySelectYN() {
+    void findBySelectYN() {
         given(memberRepository.findBySelectYN("Y"))
                 .willReturn(Optional.of(TestUtil.mockMember(1L, "Y")));
 
@@ -190,7 +193,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void findBySelectYNNotFoundMember() {
+    void findBySelectYNNotFoundMember() {
         given(memberRepository.findBySelectYN("Y"))
                 .willReturn(Optional.empty());
 
@@ -200,7 +203,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void totalInfo() {
+    void totalInfo() {
         given(memberRepository.findMemberWithSkills(1L)).willReturn(Optional.of(TestUtil.mockMember(1L, "N")));
 
         Header<MemberTotalInfoResponseDto> target = memberService.totalInfo(1L);
@@ -220,7 +223,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void totalInfoNotFoundMember() {
+    void totalInfoNotFoundMember() {
         given(memberRepository.findMemberWithSkills(1L)).willReturn(Optional.empty());
 
         assertThatExceptionOfType(MemberNotFoundException.class)
@@ -229,7 +232,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateSelect() {
+    void updateSelect() {
         Member member = TestUtil.mockMember(1L, "N");
         Member member2 = TestUtil.mockMember(2L, "Y");
         List<Member> list = new ArrayList<>();
@@ -250,7 +253,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateSelectNotFoundMember() {
+    void updateSelectNotFoundMember() {
         Member member = TestUtil.mockMember(1L, "N");
         Member member2 = TestUtil.mockMember(2L, "Y");
         List<Member> list = new ArrayList<>();

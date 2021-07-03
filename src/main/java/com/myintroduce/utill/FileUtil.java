@@ -13,6 +13,10 @@ import java.util.Enumeration;
 
 public class FileUtil {
 
+    private FileUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     // 파일 이름이 기준 length 보다 길경우 잘라서 리턴 메서드
     public static String cutFileName (String fileName, int length) {
         if(fileName.length() <= length) {
@@ -66,17 +70,17 @@ public class FileUtil {
     public static String mappingSpecialCharacter(String name) {
 
         // 파일명에 사용되는 특수문자
-        char[] sh_list = { '~', '!', '@', '#', '$', '%', '&', '(', ')', '=', ';', '[', ']', '{', '}', '^', '-' };
+        char[] shList = { '~', '!', '@', '#', '$', '%', '&', '(', ')', '=', ';', '[', ']', '{', '}', '^', '-' };
         try {
-            for (char sh : sh_list) {
+            for (char sh : shList) {
                 String encodeStr = URLEncoder.encode(sh + "", "UTF-8");
                 name = name.replaceAll(encodeStr, "\\" + sh);
             }
 
             // 띄워쓰기 -> + 치환
-            name = name.replaceAll("%2B", "+");
+            name = name.replace("%2B", "+");
             // 콤마 -> _ 치환
-            name = name.replaceAll("%2C", "_");
+            name = name.replace("%2C", "_");
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

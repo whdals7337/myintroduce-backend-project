@@ -63,7 +63,7 @@ class FileControllerTest {
     }
 
     @Test
-    public void no_member() throws Exception {
+    void no_member() throws Exception {
         String url = "http://localhost:" + port + "/download/member/1";
         mockMvc.perform(get(url)
                 .header("Authorization", "Bearer "+token))
@@ -73,7 +73,7 @@ class FileControllerTest {
     }
 
     @Test
-    public void no_skill() throws Exception {
+    void no_skill() throws Exception {
         String url = "http://localhost:" + port + "/download/skill/1";
         mockMvc.perform(get(url)
                 .header("Authorization", "Bearer "+token))
@@ -83,7 +83,7 @@ class FileControllerTest {
     }
 
     @Test
-    public void no_project() throws Exception {
+    void no_project() throws Exception {
         String url = "http://localhost:" + port + "/download/project/1";
         mockMvc.perform(get(url)
                 .header("Authorization", "Bearer "+token))
@@ -93,7 +93,7 @@ class FileControllerTest {
     }
 
     @Test
-    public void wrong_type() throws Exception {
+    void wrong_type() throws Exception {
         Member member = givenMember();
         String url = "http://localhost:" + port + "/download/wrong/1";
         mockMvc.perform(get(url)
@@ -104,7 +104,7 @@ class FileControllerTest {
     }
 
     @Test
-    public void member_download() throws Exception {
+    void member_download() throws Exception {
         MockMultipartFile testFile
                 = new MockMultipartFile(
                 "file",
@@ -144,7 +144,7 @@ class FileControllerTest {
     }
 
     @Test
-    public void download_no_support_browser() throws Exception {
+    void download_no_support_browser() throws Exception {
         MockMultipartFile testFile
                 = new MockMultipartFile(
                 "file",
