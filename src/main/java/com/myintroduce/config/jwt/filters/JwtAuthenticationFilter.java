@@ -24,22 +24,27 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtUtil jwtUtil;
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        ObjectMapper om = new ObjectMapper();
-        LoginRequestDto loginRequestDto = null;
+    public Authentication attemptAuthentication(HttpServletRequest request,
+                                                HttpServletResponse response) throws AuthenticationException {
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            LoginRequestDto loginRequestDto = objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword());
 
-        try {
-            loginRequestDto = om.readValue(request.getInputStream(), LoginRequestDto.class);
+            // loadUserByUsername() 실행됨
+            return authenticationManager.authenticate(authenticationToken);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword());
-
-        return authenticationManager.authenticate(authenticationToken);
+        return null;
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authResult) throws IOException, ServletException {
         PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
         String jwtToken = jwtUtil.createToken(principalDetails.getUser().getId(), principalDetails.getUsername());
         response.addHeader("Authorization", "Bearer "+jwtToken);
