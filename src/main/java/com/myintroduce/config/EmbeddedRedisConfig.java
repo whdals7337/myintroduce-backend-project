@@ -1,15 +1,11 @@
 package com.myintroduce.config;
 
-import com.myintroduce.config.redisstrategy.LinuxStrategy;
 import com.myintroduce.config.redisstrategy.OSStrategy;
-import com.myintroduce.config.redisstrategy.WindowStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import redis.embedded.RedisServer;
 
 import javax.annotation.PostConstruct;
@@ -42,18 +38,6 @@ public class EmbeddedRedisConfig {
         if (redisServer != null) {
             redisServer.stop();
         }
-    }
-
-    @Profile("dev")
-    @Bean
-    public OSStrategy windowStrategy() {
-        return new WindowStrategy();
-    }
-
-    @Profile({"test", "ops"})
-    @Bean
-    public OSStrategy linuxStrategy() {
-        return new LinuxStrategy();
     }
 
     /**
