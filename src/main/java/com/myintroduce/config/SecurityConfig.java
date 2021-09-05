@@ -4,7 +4,7 @@ import com.myintroduce.config.jwt.filters.JwtAuthenticationFilter;
 import com.myintroduce.config.jwt.filters.JwtAuthorizationFilter;
 import com.myintroduce.repository.user.UserRepository;
 import com.myintroduce.utill.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,17 +15,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+@RequiredArgsConstructor
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${jwt.signature}")
     private String signature;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private CorsConfig corsConfig;
+    private final UserRepository userRepository;
+    private final CorsConfig corsConfig;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
